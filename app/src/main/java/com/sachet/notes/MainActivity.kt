@@ -12,10 +12,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sachet.notes.data.Note
-import com.sachet.notes.model.NoteViewModal
 import com.sachet.notes.navigation.NotesNavigation
 import com.sachet.notes.ui.theme.NotesTheme
 
