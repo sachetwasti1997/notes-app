@@ -1,5 +1,6 @@
 package com.sachet.notes.screen
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
@@ -13,19 +14,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.sachet.notes.components.ButtonComponent
 import com.sachet.notes.components.InputTextComponent
 import com.sachet.notes.data.Note
+import com.sachet.notes.navigation.NotesScreen
 
 
 @Composable
 fun CreateNoteScreen(
     navController: NavController,
-    onAddNote: (Note) -> Unit
+    onAddNote: (Note) -> Unit = {},
+    viewModal: NotesViewModal = hiltViewModel()
 ){
 
     var title by remember {
@@ -35,6 +38,8 @@ fun CreateNoteScreen(
     var description by remember {
         mutableStateOf("")
     }
+
+    Log.d("ONCLICK", "CreateNoteScreen: ${viewModal.data.value.data?.toMutableList()}")
 
     Scaffold(
         topBar = {
@@ -90,7 +95,9 @@ fun CreateNoteScreen(
                         text = "Save",
                         onClick = {
                             onAddNote(Note(title = title, description = description))
-                            navController.popBackStack()
+                            viewModal.saveNote(Note(title = title, description = description))
+
+                            navController.navigate(route = NotesScreen.HomeScreen.name)
                         },
                         enabled = (title.isNotEmpty() && description.isNotEmpty())
                     )

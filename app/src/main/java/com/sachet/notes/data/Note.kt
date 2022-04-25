@@ -1,11 +1,9 @@
 package com.sachet.notes.data
 
-import java.time.LocalDateTime
-import java.util.*
-
-data class Note(
-    val id: UUID = UUID.randomUUID(),
-    val title: String,
-    val description: String,
-    val entryDate: LocalDateTime = LocalDateTime.now()
+data class Note constructor(
+    val noteId: String?= null,
+    val title: String ?= null,
+    val description: String ?= null,
+    val userId: String = "user1",
+    val localDateTime: String ?= null
 )

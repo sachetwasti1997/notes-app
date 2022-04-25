@@ -1,7 +1,6 @@
 package com.sachet.notes.screen
 
-import android.os.Build
-import androidx.annotation.RequiresApi
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,35 +12,31 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.sachet.notes.data.Note
 import com.sachet.notes.navigation.NotesScreen
-import java.time.format.DateTimeFormatter
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NoteScreen(
     navController: NavController,
-    notesList: MutableMap<String,Note>,
-    onDeleteNote: (id: String) -> Unit
+    notesList: MutableList<Note>?,
+    onDeleteNote: () -> Unit = {}
 ){
     Scaffold(
         topBar = {
             CreateMainTopBar(navController)
         }
     ) {
-        CreateNoteList(notesList = notesList, onDeleteNote)
+        CreateNoteList(notesListRefined = notesList, onDeleteNote)
     }
 }
 
@@ -84,10 +79,21 @@ fun CreateMainTopBar(navController: NavController){
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CreateNoteList(notesList: MutableMap<String,Note>, onDeleteNote: (id: String) -> Unit){
-    if (notesList.isEmpty()){
+fun CreateNoteList(notesListRefined: MutableList<Note>?, onDeleteNote: () -> Unit, viewModal: NotesViewModal = hiltViewModel()){
+    val notesList = viewModal.data.value.data?.toMutableList()
+    val isLoading = viewModal.data.value.loading
+//    val newNote = viewModal.newNote.value
+//    if (newNote){
+//        viewModal.getAllNoteOfUser("user1")
+//    }
+    Log.d("CREATENOTEEE", "CreateNoteList: $notesList $isLoading")
+    if (notesList?.isEmpty() == true /*&& isLoading == false*/){
+        viewModal.getAllNoteOfUser("user1")
+        Log.d("EMPTYNOTELIST", "CreateNoteList: $notesList $isLoading")
+    }
+    else if (notesList == null){
+//        Log.d("NOTELIST", "CreateNoteList: ${}")
         Box(
             modifier = Modifier
                 .padding(start = 20.dp, end = 20.dp)
@@ -120,7 +126,7 @@ fun CreateNoteList(notesList: MutableMap<String,Note>, onDeleteNote: (id: String
     else{
         Column(modifier = Modifier.padding(12.dp)){
             LazyColumn{
-                items(notesList.values.toMutableList()){
+                items(notesList!!.toList()/*.toMutableList()*/){
                     NoteRow(note = it, onDeleteNote = onDeleteNote)
                 }
             }
@@ -128,9 +134,8 @@ fun CreateNoteList(notesList: MutableMap<String,Note>, onDeleteNote: (id: String
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun NoteRow(note: Note, onDeleteNote: (id: String) -> Unit){
+fun NoteRow(note: Note, onDeleteNote: () -> Unit){
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -150,17 +155,19 @@ fun NoteRow(note: Note, onDeleteNote: (id: String) -> Unit){
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = note.title, style = MaterialTheme.typography.subtitle2)
-                Text(text = note.description, style = MaterialTheme.typography.subtitle1)
-                Text(
-                    text = note.entryDate.format(DateTimeFormatter.ofPattern("EEE, d MMM")),
-                    style = MaterialTheme.typography.caption
-                )
+                Text(text = note.title.toString(), style = MaterialTheme.typography.subtitle2)
+                Text(text = note.description.toString(), style = MaterialTheme.typography.subtitle1)
+                note.localDateTime?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.caption
+                    )
+                }
             }
             Surface(
                 modifier = Modifier
                     .fillMaxWidth(fraction = 0.3f)
-                    .clickable { onDeleteNote(note.id.toString()) },
+                    .clickable { onDeleteNote() },
                 shape = RoundedCornerShape(CornerSize(4.dp))
             ) {
                 Icon(

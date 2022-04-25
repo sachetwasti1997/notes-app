@@ -1,10 +1,9 @@
 package com.sachet.notes
 
-import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -12,35 +11,43 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.sachet.notes.data.Note
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.sachet.notes.navigation.NotesNavigation
+import com.sachet.notes.screen.NotesViewModal
 import com.sachet.notes.ui.theme.NotesTheme
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.DEBUG_PROPERTY_NAME
+import kotlinx.coroutines.DEBUG_PROPERTY_VALUE_ON
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        System.setProperty (DEBUG_PROPERTY_NAME, DEBUG_PROPERTY_VALUE_ON)
         setContent {
             NotesTheme {
                 // A surface container using the 'background' color from the theme
-                val noteList = remember {
-                    mutableStateMapOf<String, Note>()
-                }
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    NotesNavigation(
-                        noteList,
-                        {
-                            noteList[it.id.toString()] = it
-                        }
-                    ) {
-                        noteList.remove(it)
-                    }
-                }
+                val viewModal : NotesViewModal = hiltViewModel()
+                MainApp()
             }
         }
+    }
+}
+
+@Composable
+fun MainApp(viewModal: NotesViewModal = hiltViewModel()){
+    val noteList = viewModal.data.value.data?.toMutableList()
+//    if (noteList?.isEmpty() == true){
+//        viewModal.getAllNoteOfUser("user1")
+//    }
+    Log.d("START", "onCreate: $noteList")
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colors.background
+    ) {
+        NotesNavigation(
+            noteList,
+        )
     }
 }
 
