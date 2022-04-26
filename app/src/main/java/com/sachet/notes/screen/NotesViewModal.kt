@@ -63,7 +63,9 @@ class NotesViewModal
 
     fun getAllNoteOfUser(userId: String){
         viewModelScope.launch {
-            _state.value.notes = notesRepository.getAllNotes("user1")
+            _state.value = state.value.copy(
+                notes = notesRepository.getAllNotes("user1")
+            )
         }
     }
 

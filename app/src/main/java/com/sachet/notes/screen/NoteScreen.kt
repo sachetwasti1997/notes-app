@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,17 +40,17 @@ fun NoteScreen(
 ){
 
     val state = viewModal.state.value
-//    Log.d("NOTESCREEN", "NoteScreen: ${state.notes}")
 
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { /*TODO*/ },
-                backgroundColor = MaterialTheme.colors.primary
+                backgroundColor = MaterialTheme.colors.primary,
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add Note")
             }
-        }
+        },
+        floatingActionButtonPosition = FabPosition.Center
     ) {
         Column(
             modifier = Modifier
@@ -62,7 +63,7 @@ fun NoteScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Your Notes",
+                    text = "My Notes",
                     style = MaterialTheme.typography.h4
                 )
                 IconButton(
@@ -70,13 +71,13 @@ fun NoteScreen(
                         viewModal.toggleOrderSection()
                     }
                 ) {
-                    Icon(imageVector = Icons.Default.Info, contentDescription = "Sort")
+                    Icon(imageVector = Icons.Default.Menu, contentDescription = "Sort")
                 }
             }
             AnimatedVisibility(
                 visible = state.isOrderSectionVisible,
-                enter = fadeIn() + slideInVertically(),
-                exit = fadeOut() + slideOutVertically()
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
             ) {
                 OrderSection(
                     onOrderChange = {
