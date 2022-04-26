@@ -29,21 +29,21 @@ class NotesRepository
         return noteSaved
     }
 
-    suspend fun getAllNotes(userId: String): Response<ArrayList<Note>, Boolean, Exception>{
-        val noteList = Response<ArrayList<Note>, Boolean, Exception>(null, true, null)
+    suspend fun getAllNotes(
+        userId: String,
+//        notesOrder: NotesOrder = NotesOrder.Title(OrderType.Descending)
+    ): ArrayList<Note>{
+        var noteList = ArrayList<Note>()
         try {
-            noteList.data = notesApi.getNotesOfUser(userId)
+            noteList = notesApi.getNotesOfUser(userId)
             Log.d("NotesRepository", "getNotes: $noteList")
-            noteList.loading = false
         }catch (ex: CancellationException){
             Log.d("Notes", "saveNotes: $ex")
-            noteList.loading = false
-            noteList.exception = ex
         }catch (ex: Exception){
             Log.d("Notes", "saveNotes: $ex")
-            noteList.loading = false
-            noteList.exception = ex
         }
         return noteList
     }
+
+
 }

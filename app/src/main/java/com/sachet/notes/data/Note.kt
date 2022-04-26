@@ -2,8 +2,9 @@ package com.sachet.notes.data
 
 data class Note constructor(
     val noteId: String?= null,
-    val title: String ?= null,
-    val description: String ?= null,
+    val title: String ,
+    val description: String ,
     val userId: String = "user1",
-    val localDateTime: String ?= null
+    val localDateTime: String ,
+    val color: Int
 )

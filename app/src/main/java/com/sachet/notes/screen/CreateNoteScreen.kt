@@ -24,123 +24,123 @@ import com.sachet.notes.data.Note
 import com.sachet.notes.navigation.NotesScreen
 
 
-@Composable
-fun CreateNoteScreen(
-    navController: NavController,
-    onAddNote: (Note) -> Unit = {},
-    viewModal: NotesViewModal = hiltViewModel()
-){
-
-    var title by remember {
-        mutableStateOf("")
-    }
-
-    var description by remember {
-        mutableStateOf("")
-    }
-
-    Log.d("ONCLICK", "CreateNoteScreen: ${viewModal.data.value.data?.toMutableList()}")
-
-    Scaffold(
-        topBar = {
-            CreateTopBar(navController = navController)
-        }
-
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 90.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .height(300.dp),
-                elevation = 15.dp
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-
-                    InputTextComponent(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp),
-                        text = title,
-                        label = "Title",
-                        onTextChange = {
-                            title = it
-                        }
-                    )
-
-                    InputTextComponent(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp),
-                        text = description,
-                        label = "Add a Note",
-                        onTextChange = {
-                            description = it
-                        },
-                        maxLine = 5
-                    )
-
-                    ButtonComponent(
-                        modifier = Modifier
-                            .padding(10.dp),
-                        text = "Save",
-                        onClick = {
-                            onAddNote(Note(title = title, description = description))
-                            viewModal.saveNote(Note(title = title, description = description))
-
-                            navController.navigate(route = NotesScreen.HomeScreen.name)
-                        },
-                        enabled = (title.isNotEmpty() && description.isNotEmpty())
-                    )
-
-                }
-            }
-        }
-        }
-}
-
-@Composable
-fun CreateTopBar(navController: NavController){
-    TopAppBar(
-        modifier = Modifier
-            .padding(2.dp)
-            .clip(RoundedCornerShape(CornerSize(10.dp))),
-        backgroundColor = Color.Magenta
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Surface(modifier = Modifier.size(30.dp), color = Color.Magenta) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Back Arrow",
-                    tint = Color.White,
-                    modifier = Modifier.clickable { navController.popBackStack() }
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 30.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Create Note",
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.ExtraBold
-                )
-            }
-        }
-    }
-}
+//@Composable
+//fun CreateNoteScreen(
+//    navController: NavController,
+//    onAddNote: (Note) -> Unit = {},
+//    viewModal: NotesViewModal = hiltViewModel()
+//){
+//
+//    var title by remember {
+//        mutableStateOf("")
+//    }
+//
+//    var description by remember {
+//        mutableStateOf("")
+//    }
+//
+//    Log.d("ONCLICK", "CreateNoteScreen: ${viewModal.data.value.data?.toMutableList()}")
+//
+//    Scaffold(
+//        topBar = {
+//            CreateTopBar(navController = navController)
+//        }
+//
+//    ) {
+//        Box(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(bottom = 90.dp),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            Card(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(10.dp)
+//                    .height(300.dp),
+//                elevation = 15.dp
+//            ) {
+//                Column(
+//                    verticalArrangement = Arrangement.Center,
+//                    horizontalAlignment = Alignment.CenterHorizontally,
+//                    modifier = Modifier.fillMaxWidth()
+//                ) {
+//
+//                    InputTextComponent(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(10.dp),
+//                        text = title,
+//                        label = "Title",
+//                        onTextChange = {
+//                            title = it
+//                        }
+//                    )
+//
+//                    InputTextComponent(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(10.dp),
+//                        text = description,
+//                        label = "Add a Note",
+//                        onTextChange = {
+//                            description = it
+//                        },
+//                        maxLine = 5
+//                    )
+//
+//                    ButtonComponent(
+//                        modifier = Modifier
+//                            .padding(10.dp),
+//                        text = "Save",
+//                        onClick = {
+//                            onAddNote(Note(title = title, description = description))
+//                            viewModal.saveNote(Note(title = title, description = description))
+//
+//                            navController.navigate(route = NotesScreen.HomeScreen.name)
+//                        },
+//                        enabled = (title.isNotEmpty() && description.isNotEmpty())
+//                    )
+//
+//                }
+//            }
+//        }
+//        }
+//}
+//
+//@Composable
+//fun CreateTopBar(navController: NavController){
+//    TopAppBar(
+//        modifier = Modifier
+//            .padding(2.dp)
+//            .clip(RoundedCornerShape(CornerSize(10.dp))),
+//        backgroundColor = Color.Magenta
+//    ) {
+//        Row(
+//            horizontalArrangement = Arrangement.Start,
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            Surface(modifier = Modifier.size(30.dp), color = Color.Magenta) {
+//                Icon(
+//                    imageVector = Icons.Default.ArrowBack,
+//                    contentDescription = "Back Arrow",
+//                    tint = Color.White,
+//                    modifier = Modifier.clickable { navController.popBackStack() }
+//                )
+//            }
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(end = 30.dp),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                Text(
+//                    text = "Create Note",
+//                    color = Color.White,
+//                    fontSize = 20.sp,
+//                    fontWeight = FontWeight.ExtraBold
+//                )
+//            }
+//        }
+//    }
+//}

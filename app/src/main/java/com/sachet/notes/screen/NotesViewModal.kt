@@ -1,6 +1,7 @@
 package com.sachet.notes.screen
 
 import android.util.Log
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,6 +10,10 @@ import androidx.navigation.compose.rememberNavController
 import com.sachet.notes.network.NotesRepository
 import com.sachet.notes.data.Note
 import com.sachet.notes.data.Response
+import com.sachet.notes.util.NoteState
+import com.sachet.notes.util.NotesEvent
+import com.sachet.notes.util.NotesOrder
+import com.sachet.notes.util.orderBy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -20,29 +25,56 @@ class NotesViewModal
     var notesRepository: NotesRepository,
 ) : ViewModel(){
 
-    var data = mutableStateOf(
-        Response(ArrayList<Note>(), false, Exception(""))
-    )
+    private val _state = mutableStateOf(NoteState())
+    val state: State<NoteState> = _state
 
-    var newNote = mutableStateOf(false)
+    init {
+        getAllNoteOfUser("user1")
+    }
 
-    fun saveNote(note: Note){
-        viewModelScope.launch {
-            notesRepository.saveNotes(note)
-            newNote.value = true
-            Log.d("NOTEVM", "saveNote: $newNote")
+    private fun onEvent(event: NotesEvent){
+        println(event)
+        Log.d("ONEVENT", "onEvent: ${state.value.notesOrder}")
+        when(event){
+            is NotesEvent.Order -> {
+                if (state.value.notesOrder::class == event.newNotesOrder::class &&
+                    state.value.notesOrder.orderType == event.newNotesOrder.orderType
+                ){
+                    return
+                }
+                Log.d("ONEVENTEVE", "onEvent: $event.")
+                _state.value.notesOrder = event.newNotesOrder
+                _state.value.notes = orderBy(state.value.notes, event.newNotesOrder)
+            }
+            is NotesEvent.DeleteNote -> {
+
+            }
+            is NotesEvent.RestoreNotes -> {
+
+            }
+            is NotesEvent.ToggleOrderSelection -> {
+                _state.value = state.value.copy(
+                    isOrderSectionVisible = !state.value.isOrderSectionVisible
+                )
+            }
         }
     }
 
     fun getAllNoteOfUser(userId: String){
         viewModelScope.launch {
-            data.value.loading = true
-            data.value = notesRepository.getAllNotes(userId)
-            Log.d("NotesRepo", "getAllNoteOfUser: ${data.value}")
-            if (data.value.data?.isEmpty() == true){
-                data.value.data = null
-            }
-            data.value.loading = false
+            _state.value.notes = notesRepository.getAllNotes("user1")
+        }
+    }
+
+    fun toggleNotesOrder(notesEvent: NotesEvent){
+        viewModelScope.launch {
+            onEvent(notesEvent)
+        }
+    }
+
+    fun toggleOrderSection(){
+        viewModelScope.launch {
+            onEvent(NotesEvent.ToggleOrderSelection)
         }
     }
 

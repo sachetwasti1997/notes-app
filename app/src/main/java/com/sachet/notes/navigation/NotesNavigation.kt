@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.sachet.notes.data.Note
-import com.sachet.notes.screen.CreateNoteScreen
+//import com.sachet.notes.screen.CreateNoteScreen
 import com.sachet.notes.screen.NoteScreen
 
 @Composable
@@ -19,12 +19,12 @@ fun NotesNavigation(noteList: MutableList<Note>?, onAddNote: (Note) -> Unit = {}
         startDestination = NotesScreen.HomeScreen.name,
     ){
         composable(NotesScreen.HomeScreen.name){
-            NoteScreen(navController = navController, notesList = noteList)
+            NoteScreen(navController = navController)
         }
         composable(NotesScreen.CreateNotesScreen.name){
-            CreateNoteScreen(
-                navController = navController,
-            )
+//            CreateNoteScreen(
+//                navController = navController,
+//            )
         }
     }
 }

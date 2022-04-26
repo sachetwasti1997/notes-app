@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.sachet.notes.data.Note
 import com.sachet.notes.navigation.NotesNavigation
 import com.sachet.notes.screen.NotesViewModal
 import com.sachet.notes.ui.theme.NotesTheme
@@ -36,11 +37,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainApp(viewModal: NotesViewModal = hiltViewModel()){
-    val noteList = viewModal.data.value.data?.toMutableList()
+//    val noteList = viewModal.data.value.data?.toMutableList()
 //    if (noteList?.isEmpty() == true){
 //        viewModal.getAllNoteOfUser("user1")
 //    }
-    Log.d("START", "onCreate: $noteList")
+//    Log.d("START", "onCreate: $noteList")
+    val noteList = mutableListOf<Note>()
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background
