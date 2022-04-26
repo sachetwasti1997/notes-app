@@ -36,11 +36,11 @@ class NotesRepository
         var noteList = ArrayList<Note>()
         try {
             noteList = notesApi.getNotesOfUser(userId)
-            Log.d("NotesRepository", "getNotes: $noteList")
+//            Log.d("NotesRepository", "getNotes: $noteList")
         }catch (ex: CancellationException){
-            Log.d("Notes", "saveNotes: $ex")
+//            Log.d("Notes", "saveNotes: $ex")
         }catch (ex: Exception){
-            Log.d("Notes", "saveNotes: $ex")
+//            Log.d("Notes", "saveNotes: $ex")
         }
         return noteList
     }

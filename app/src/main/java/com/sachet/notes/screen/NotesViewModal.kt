@@ -3,6 +3,7 @@ package com.sachet.notes.screen
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -33,8 +34,7 @@ class NotesViewModal
     }
 
     private fun onEvent(event: NotesEvent){
-        println(event)
-        Log.d("ONEVENT", "onEvent: ${state.value.notesOrder}")
+        Log.d("ONEVENT", "onEvent: ${state},,,${_state}")
         when(event){
             is NotesEvent.Order -> {
                 if (state.value.notesOrder::class == event.newNotesOrder::class &&
@@ -42,9 +42,10 @@ class NotesViewModal
                 ){
                     return
                 }
-                Log.d("ONEVENTEVE", "onEvent: $event.")
-                _state.value.notesOrder = event.newNotesOrder
-                _state.value.notes = orderBy(state.value.notes, event.newNotesOrder)
+                _state.value = state.value.copy(
+                    notes = orderBy(state.value.notes, event.newNotesOrder),
+                    notesOrder = event.newNotesOrder
+                )
             }
             is NotesEvent.DeleteNote -> {
 

@@ -59,12 +59,15 @@ fun NoteItem(
                 )
             }
         }
-//        Row {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Bottom
+        ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-                    .padding(end = 32.dp)
+                    .padding(start = 6.dp, bottom = 6.dp, top = 6.dp)
+                    .fillMaxWidth(0.7F)
             ) {
                 Text(
                     text = note.title,
@@ -81,15 +84,15 @@ fun NoteItem(
                     maxLines = 10,
                     overflow = TextOverflow.Ellipsis
                 )
-                IconButton(onClick = onDeleteClick) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete Note"
-                    )
-                }
+            }
+            IconButton(onClick = onDeleteClick, modifier = Modifier.fillMaxWidth(0.3F)) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete Note"
+                )
             }
         }
-//    }
+    }
 }
 
 

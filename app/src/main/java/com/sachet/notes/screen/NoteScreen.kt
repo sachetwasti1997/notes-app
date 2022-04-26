@@ -39,7 +39,7 @@ fun NoteScreen(
 ){
 
     val state = viewModal.state.value
-    Log.d("NOTESCREEN", "NoteScreen: ${state.notes}")
+//    Log.d("NOTESCREEN", "NoteScreen: ${state.notes}")
 
     Scaffold(
         floatingActionButton = {
@@ -96,6 +96,7 @@ fun NoteScreen(
                         note = note,
                         modifier = Modifier
                             .fillMaxWidth()
+                            .padding(bottom = 20.dp)
                             .clickable { },
                         onDeleteClick = {
 

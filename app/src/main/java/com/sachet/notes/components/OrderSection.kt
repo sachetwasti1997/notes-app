@@ -6,6 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.sachet.notes.screen.NotesViewModal
 import com.sachet.notes.util.NotesOrder
 import com.sachet.notes.util.OrderType
 
@@ -13,9 +15,10 @@ import com.sachet.notes.util.OrderType
 fun OrderSection(
     modifier: Modifier = Modifier,
     notesOrder: NotesOrder = NotesOrder.Date(OrderType.Ascending),
-    onOrderChange: (NotesOrder) -> Unit
+    onOrderChange: (NotesOrder) -> Unit,
+    viewModal: NotesViewModal = hiltViewModel()
 ){
-    Log.d("ORDER", "OrderSection: $notesOrder")
+    Log.d("ORDER", "OrderSection: ${viewModal.state.value.notesOrder}")
     Column(
         modifier,
     ) {

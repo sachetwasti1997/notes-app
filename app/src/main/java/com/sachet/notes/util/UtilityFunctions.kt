@@ -5,7 +5,7 @@ import com.sachet.notes.data.Note
 
 fun orderBy(noteList: List<Note>, notesOrder: NotesOrder): List<Note>{
     var modifiedNotes = noteList
-    Log.d("SORT", "orderBy: $noteList")
+//    Log.d("SORT", "orderBy: $noteList")
     when(notesOrder.orderType){
         is OrderType.Ascending -> {
             modifiedNotes = when(notesOrder){
