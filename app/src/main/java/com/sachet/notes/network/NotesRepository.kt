@@ -16,7 +16,6 @@ class NotesRepository
         val noteSaved = Response<Note, Boolean, Exception>(null, true, null)
         try {
             noteSaved.data = notesApi.saveNote(note)
-//            Log.d("NotesRepository", "saveNotes: $noteSaved")
             noteSaved.loading = false
         }catch (ex: CancellationException){
 //            Log.d("Notes", "saveNotes: $ex")
@@ -31,12 +30,10 @@ class NotesRepository
 
     suspend fun getAllNotes(
         userId: String,
-//        notesOrder: NotesOrder = NotesOrder.Title(OrderType.Descending)
     ): ArrayList<Note>{
         var noteList = ArrayList<Note>()
         try {
             noteList = notesApi.getNotesOfUser(userId)
-//            Log.d("NotesRepository", "getNotes: $noteList")
         }catch (ex: CancellationException){
 //            Log.d("Notes", "saveNotes: $ex")
         }catch (ex: Exception){

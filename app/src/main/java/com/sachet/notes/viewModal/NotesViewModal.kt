@@ -1,4 +1,4 @@
-package com.sachet.notes.screen
+package com.sachet.notes.viewModal
 
 import android.util.Log
 import androidx.compose.runtime.State

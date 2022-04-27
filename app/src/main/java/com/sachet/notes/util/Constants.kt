@@ -4,3 +4,4 @@ object Constants {
     const val BASE_URL = "http://192.168.0.110:8080/notes/"
 }
 //192.168.0.110
+//10.0.2.2
