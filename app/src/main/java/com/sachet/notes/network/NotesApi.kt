@@ -13,4 +13,6 @@ interface NotesApi {
     suspend fun saveNote(@Body note: Note): Note
     @GET("{userId}")
     suspend fun getNotesOfUser(@Path("userId") userId: String): ArrayList<Note>
+    @GET("single/{noteId}")
+    suspend fun getNoteById(@Path("noteId") noteId: String): Note?
 }

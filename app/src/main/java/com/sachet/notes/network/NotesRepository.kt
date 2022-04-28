@@ -42,5 +42,19 @@ class NotesRepository
         return noteList
     }
 
+    suspend fun getNoteById(
+        noteId: String
+    ): Note?{
+        var note: Note? = null
+        try {
+               note = notesApi.getNoteById(noteId)
+        }catch (ex: CancellationException){
+//            Log.d("Notes", "saveNotes: $ex")
+        }catch (ex: Exception){
+//            Log.d("Notes", "saveNotes: $ex")
+        }
+        return note
+    }
+
 
 }

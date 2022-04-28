@@ -18,6 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.sachet.notes.components.NoteItem
 import com.sachet.notes.components.OrderSection
+import com.sachet.notes.navigation.NotesScreen
 import com.sachet.notes.util.NotesEvent
 import com.sachet.notes.viewModal.NotesViewModal
 
@@ -32,7 +33,11 @@ fun NoteScreen(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    navController.navigate(NotesScreen.CreateNotesScreen.name
+                        +"?noteId=&noteColor=-1"
+                    )
+                },
                 backgroundColor = MaterialTheme.colors.primary,
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add Note")
@@ -86,7 +91,12 @@ fun NoteScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 20.dp)
-                            .clickable { },
+                            .clickable {
+                                navController.navigate(
+                                    route = NotesScreen.CreateNotesScreen.name
+                                            +"?noteId=${note.noteId}&noteColor=${note.color}"
+                                )
+                            },
                         onDeleteClick = {
 
                         }
