@@ -1,6 +1,5 @@
 package com.sachet.notes.viewModal
 
-import android.provider.ContactsContract
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.toArgb
@@ -97,10 +96,10 @@ class AddEditNoteViewModal
                     notesRepository.saveNotes(
                         Note(
                             noteId = if (currentNoteId != null) currentNoteId else null,
-                        title = noteTitle.value.text,
-                        description = noteContent.value.text,
-                        userId = "user1",
-                        color = _noteColor.value
+                            title = noteTitle.value.text,
+                            description = noteContent.value.text,
+                            userId = "user1",
+                            color = _noteColor.value
                         )
                     )
                     _eventFlow.emit(UiEvent.SaveNote)

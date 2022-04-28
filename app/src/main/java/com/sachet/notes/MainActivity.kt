@@ -36,11 +36,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainApp(viewModal: NotesViewModal = hiltViewModel()){
-//    val noteList = viewModal.data.value.data?.toMutableList()
-//    if (noteList?.isEmpty() == true){
-//        viewModal.getAllNoteOfUser("user1")
-//    }
-//    Log.d("START", "onCreate: $noteList")
     val noteList = mutableListOf<Note>()
     Surface(
         modifier = Modifier.fillMaxSize(),
