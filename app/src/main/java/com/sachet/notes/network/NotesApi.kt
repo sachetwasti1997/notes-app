@@ -1,11 +1,10 @@
 package com.sachet.notes.network
 
 import com.sachet.notes.data.Note
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
+import retrofit2.http.*
+import java.util.*
 import javax.inject.Singleton
+import kotlin.collections.ArrayList
 
 @Singleton
 interface NotesApi {
@@ -15,4 +14,6 @@ interface NotesApi {
     suspend fun getNotesOfUser(@Path("userId") userId: String): ArrayList<Note>
     @GET("single/{noteId}")
     suspend fun getNoteById(@Path("noteId") noteId: String): Note?
+    @DELETE("{noteId}")
+    suspend fun deleteNoteById(@Path("noteId")noteId: String): String
 }

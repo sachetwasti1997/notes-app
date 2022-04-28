@@ -56,5 +56,17 @@ class NotesRepository
         return note
     }
 
+    suspend fun deleteNote(noteId: String): Response<String, Boolean, Exception>{
+        val result = Response<String, Boolean, Exception>(null, true, null)
+        try {
+            result.data = notesApi.deleteNoteById(noteId)
+        }catch (ex: CancellationException){
+            result.exception = ex
+        }catch (ex: Exception){
+            result.exception = ex
+        }
+        return result
+    }
+
 
 }

@@ -42,7 +42,18 @@ class NotesViewModal
                 )
             }
             is NotesEvent.DeleteNote -> {
-
+                viewModelScope.launch {
+                    val result = notesRepository.deleteNote(event.note.noteId!!)
+                    println(result)
+                    if (result.data != null){
+                        val newNote = _state.value.notes.filter {
+                            it.noteId != result.data
+                        }
+                        _state.value = state.value.copy(
+                            notes = newNote
+                        )
+                    }
+                }
             }
             is NotesEvent.RestoreNotes -> {
 
@@ -76,9 +87,9 @@ class NotesViewModal
     }
 
     fun deleteNote(note: Note){
-        viewModelScope.launch{
+//        viewModelScope.launch{
             onEvent(NotesEvent.DeleteNote(note))
-        }
+//        }
     }
 
 }

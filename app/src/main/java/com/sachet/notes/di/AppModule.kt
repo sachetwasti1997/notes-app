@@ -1,5 +1,7 @@
 package com.sachet.notes.di
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.sachet.notes.network.NotesRepository
 import com.sachet.notes.network.NotesApi
 import com.sachet.notes.util.Constants
@@ -22,10 +24,14 @@ object AppModule {
     @Singleton
     @Provides
     fun providesNotesApi():NotesApi{
+        val gson = GsonBuilder()
+            .setLenient()
+            .create()
+
         return Retrofit
             .Builder()
             .baseUrl(Constants.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(NotesApi::class.java)
     }

@@ -98,7 +98,7 @@ fun NoteScreen(
                                 )
                             },
                         onDeleteClick = {
-
+                            viewModal.deleteNote(note)
                         }
                     )
                 }
