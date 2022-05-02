@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -19,16 +20,23 @@ import androidx.navigation.NavController
 import com.sachet.notes.components.NoteItem
 import com.sachet.notes.components.OrderSection
 import com.sachet.notes.navigation.NotesScreen
+import com.sachet.notes.util.NoteState
 import com.sachet.notes.util.NotesEvent
 import com.sachet.notes.viewModal.NotesViewModal
 
 @Composable
 fun NoteScreen(
     navController: NavController,
+    noteList: State<NoteState>,
+    noteId: String?,
     viewModal: NotesViewModal = hiltViewModel()
 ){
 
     val state = viewModal.state.value
+    if (state.notes.isEmpty()){
+        viewModal.setNotes(noteList)
+    }
+    println("NNN $noteId")
 
     Scaffold(
         floatingActionButton = {
@@ -94,7 +102,7 @@ fun NoteScreen(
                             .clickable {
                                 navController.navigate(
                                     route = NotesScreen.CreateNotesScreen.name
-                                            +"?noteId=${note.noteId}&noteColor=${note.color}"
+                                            + "?noteId=${note.noteId}&noteColor=${note.color}"
                                 )
                             },
                         onDeleteClick = {

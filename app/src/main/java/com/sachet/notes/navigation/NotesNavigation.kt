@@ -3,6 +3,7 @@ package com.sachet.notes.navigation
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -13,16 +14,28 @@ import com.sachet.notes.data.Note
 import com.sachet.notes.screen.CreateNoteScreen
 //import com.sachet.notes.screen.CreateNoteScreen
 import com.sachet.notes.screen.NoteScreen
+import com.sachet.notes.util.NoteState
 
 @Composable
-fun NotesNavigation(noteList: MutableList<Note>?, onAddNote: (Note) -> Unit = {}, onDeleteNot: (id: String) -> Unit = {}){
+fun NotesNavigation(noteList: State<NoteState>, onAddNote: (Note) -> Unit = {}, onDeleteNot: (id: String) -> Unit = {}){
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = NotesScreen.HomeScreen.name,
+        startDestination = "${NotesScreen.HomeScreen.name}?noteId={noteId}",
     ){
-        composable(NotesScreen.HomeScreen.name){
-            NoteScreen(navController = navController)
+        composable(
+            route = NotesScreen.HomeScreen.name+"?noteId={noteId}",
+            arguments = listOf(
+                navArgument(
+                    name= "noteId"
+                ){
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
+            )
+        ){
+            val noteId = it.arguments?.getString("noteId")
+            NoteScreen(navController = navController, noteList = noteList, noteId = noteId)
         }
         composable(
             route = NotesScreen.CreateNotesScreen.name

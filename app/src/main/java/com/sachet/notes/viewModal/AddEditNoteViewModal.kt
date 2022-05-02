@@ -60,8 +60,8 @@ class AddEditNoteViewModal
 
     }
 
-    sealed class UiEvent {
-        object SaveNote: UiEvent()
+    open class UiEvent(var noteId: String?) {
+        class SaveNote(noteId: String?) : UiEvent(noteId)
     }
 
     fun onEvent(event: AddEditNoteEvent){
@@ -101,8 +101,9 @@ class AddEditNoteViewModal
                             userId = "user1",
                             color = _noteColor.value
                         )
-                    )
-                    _eventFlow.emit(UiEvent.SaveNote)
+                    ).also {
+                        if(it.data != null) _eventFlow.emit(UiEvent.SaveNote(it.data!!.noteId))
+                    }
                 }
             }
         }
