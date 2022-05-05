@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,10 +34,21 @@ fun NoteScreen(
 ){
 
     val state = viewModal.state.value
-    if (state.notes.isEmpty()){
+    if (state.notes.isEmpty() && state.ex == null){
         viewModal.setNotes(noteList)
     }
-    println("NNN $noteId")
+    println("NNN $noteList")
+
+    val scaffoldState = rememberScaffoldState()
+
+    if (state.ex != null){
+        LaunchedEffect(scaffoldState.snackbarHostState){
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = state.ex,
+                actionLabel = "Please Retry Again"
+            )
+        }
+    }
 
     Scaffold(
         floatingActionButton = {
@@ -51,7 +63,8 @@ fun NoteScreen(
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add Note")
             }
         },
-        floatingActionButtonPosition = FabPosition.Center
+        floatingActionButtonPosition = FabPosition.Center,
+        scaffoldState = scaffoldState
     ) {
         Column(
             modifier = Modifier

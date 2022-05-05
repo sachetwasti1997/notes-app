@@ -103,7 +103,8 @@ class NotesViewModal
         _state.value = state.value.copy(
             notes = noteList.value.notes,
             notesOrder = noteList.value.notesOrder,
-            isOrderSectionVisible = noteList.value.isOrderSectionVisible
+            isOrderSectionVisible = noteList.value.isOrderSectionVisible,
+            ex = noteList.value.ex
         )
     }
 

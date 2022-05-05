@@ -31,15 +31,15 @@ class NotesRepository
     suspend fun getAllNotes(
         userId: String,
     ): ArrayList<Note>{
-        var noteList = ArrayList<Note>()
-        try {
-            noteList = notesApi.getNotesOfUser(userId)
-        }catch (ex: CancellationException){
-//            Log.d("Notes", "saveNotes: $ex")
-        }catch (ex: Exception){
-//            Log.d("Notes", "saveNotes: $ex")
-        }
-        return noteList
+//        var noteList = ArrayList<Note>()
+//        try {
+            return notesApi.getNotesOfUser(userId)
+//        }catch (ex: CancellationException){
+////            Log.d("Notes", "saveNotes: $ex")
+//        }catch (ex: Exception){
+////            Log.d("Notes", "saveNotes: $ex")
+//        }
+//        return noteList
     }
 
     suspend fun getNoteById(

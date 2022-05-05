@@ -1,5 +1,6 @@
 package com.sachet.notes.viewModal
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -7,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.sachet.notes.network.NotesRepository
 import com.sachet.notes.util.NoteState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,9 +27,21 @@ class MainViewModal
 
     private fun getAllNoteOfUser(userId: String){
         viewModelScope.launch {
-            _state.value = state.value.copy(
-                notes = notesRepository.getAllNotes(userId)
-            )
+            try {
+                val noteList = notesRepository.getAllNotes(userId)
+                _state.value = state.value.copy(
+                    notes = noteList,
+                    ex = null
+                )
+            } catch (ex: CancellationException){
+                _state.value = state.value.copy(
+                    ex = ex.localizedMessage
+                )
+            }catch (ex: Exception){
+                _state.value = state.value.copy(
+                    ex = ex.localizedMessage
+                )
+            }
         }
     }
 }

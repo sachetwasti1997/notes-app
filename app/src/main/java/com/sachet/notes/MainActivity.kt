@@ -35,6 +35,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainApp(viewModal: MainViewModal = hiltViewModel()){
     val noteList = viewModal.state
+    println("Main $noteList")
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background
