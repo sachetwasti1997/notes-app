@@ -126,6 +126,7 @@ fun CreateNoteScreen(
                 },
                 isHintVisible = title.isHintVisible,
                 singleLine = true,
+                lines = 1,
                 textStyle = TextStyle(
                     color = MaterialTheme.colors.onSurface,
                     fontWeight = FontWeight.Bold
@@ -143,6 +144,7 @@ fun CreateNoteScreen(
                 },
                 isHintVisible = content.isHintVisible,
                 singleLine = false,
+                lines = 10,
                 textStyle = TextStyle(
                     color = MaterialTheme.colors.onSurface,
                     fontWeight = FontWeight.Normal
