@@ -7,11 +7,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sachet.notes.data.Note
+import com.sachet.notes.db.UserCredRepository
 import com.sachet.notes.network.NotesRepository
 import com.sachet.notes.util.NoteState
 import com.sachet.notes.util.NotesEvent
 import com.sachet.notes.util.orderBy
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,6 +21,7 @@ import javax.inject.Inject
 class NotesViewModal
 @Inject constructor(
     var notesRepository: NotesRepository,
+    var userCredRepository: UserCredRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel(){
 
@@ -56,7 +59,18 @@ class NotesViewModal
                 }
             }
         }
+//        getUserCred()
     }
+
+//    fun getUserCred(){
+//        viewModelScope.launch {
+//            userCredRepository.getCred().onEach {
+//                _state.value = state.value.copy(
+//                    credential = it.authToken
+//                )
+//            }
+//        }
+//    }
 
     private fun onEvent(event: NotesEvent){
         Log.d("ONEVENT", "onEvent: ${state},,,${_state}")

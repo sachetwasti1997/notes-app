@@ -7,5 +7,6 @@ data class NoteState(
     var notes: List<Note> = ArrayList(),
     var notesOrder: NotesOrder = NotesOrder.Date(OrderType.Ascending),
     val isOrderSectionVisible: Boolean = false,
-    val ex: String? = null
+    val ex: String? = null,
+    val credential: String ?= null
 )

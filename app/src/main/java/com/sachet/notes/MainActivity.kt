@@ -1,5 +1,6 @@
 package com.sachet.notes
 
+import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,7 +12,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.sachet.notes.db.UserCredDatabase
 import com.sachet.notes.navigation.NotesNavigation
+import com.sachet.notes.screen.LoginScreen
+import com.sachet.notes.screen.LoginSignUpScreen
 import com.sachet.notes.ui.theme.NotesTheme
 import com.sachet.notes.viewModal.MainViewModal
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,24 +30,26 @@ class MainActivity : ComponentActivity() {
         setContent {
             NotesTheme {
                 // A surface container using the 'background' color from the theme
-                MainApp()
+                MainApp(application)
             }
         }
     }
 }
 
 @Composable
-fun MainApp(viewModal: MainViewModal = hiltViewModel()){
-    val noteList = viewModal.state
-    println("Main $noteList")
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colors.background
-    ) {
-        NotesNavigation(
-            noteList,
-        )
-    }
+fun MainApp(application: Application,viewModal: MainViewModal = hiltViewModel()){
+//    val noteList = viewModal.state
+//    println("Main $noteList")
+//    Surface(
+//        modifier = Modifier.fillMaxSize(),
+//        color = MaterialTheme.colors.background
+//    ) {
+//        NotesNavigation(
+//            noteList,
+//        )
+//    }
+//    val userCredDao = UserCredDatabase.getInstance(application).userCredDao
+    LoginSignUpScreen()
 }
 
 @Composable
