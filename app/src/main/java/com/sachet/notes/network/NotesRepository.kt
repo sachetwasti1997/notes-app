@@ -1,5 +1,6 @@
 package com.sachet.notes.network
 
+import android.util.JsonToken
 import android.util.Log
 import com.sachet.notes.data.Note
 import com.sachet.notes.data.Response
@@ -12,11 +13,12 @@ class NotesRepository
     private val notesApi: NotesApi
 ){
 
-    suspend fun saveNotes(note: Note): Response<Note, Boolean, Exception>{
+    suspend fun saveNotes(token: String, note: Note): Response<Note, Boolean, Exception>{
         val noteSaved = Response<Note, Boolean, Exception>(null, true, null)
         try {
-            noteSaved.data = notesApi.saveNote(note)
+            noteSaved.data = notesApi.saveNote(token, note)
             noteSaved.loading = false
+
         }catch (ex: CancellationException){
 //            Log.d("Notes", "saveNotes: $ex")
             throw ex
@@ -29,11 +31,11 @@ class NotesRepository
     }
 
     suspend fun getAllNotes(
-        userId: String,
+        token: String,
     ): ArrayList<Note>{
 //        var noteList = ArrayList<Note>()
 //        try {
-            return notesApi.getNotesOfUser(userId)
+            return notesApi.getNotesOfUser(token)
 //        }catch (ex: CancellationException){
 ////            Log.d("Notes", "saveNotes: $ex")
 //        }catch (ex: Exception){
@@ -43,26 +45,32 @@ class NotesRepository
     }
 
     suspend fun getNoteById(
+        token: String?,
         noteId: String
     ): Note?{
         var note: Note? = null
+        println("$token $noteId")
         try {
-               note = notesApi.getNoteById(noteId)
+               note = notesApi.getNoteById(token, noteId)
         }catch (ex: CancellationException){
+            println(ex.message)
 //            Log.d("Notes", "saveNotes: $ex")
         }catch (ex: Exception){
+            println(ex.message)
 //            Log.d("Notes", "saveNotes: $ex")
         }
         return note
     }
 
-    suspend fun deleteNote(noteId: String): Response<String, Boolean, Exception>{
+    suspend fun deleteNote(token: String?, noteId: String?): Response<String, Boolean, Exception>{
         val result = Response<String, Boolean, Exception>(null, true, null)
         try {
-            result.data = notesApi.deleteNoteById(noteId)
+            result.data = notesApi.deleteNoteById(token, noteId)
         }catch (ex: CancellationException){
+            println("DELETE ${ex.message}")
             result.exception = ex
         }catch (ex: Exception){
+            println("DELETE ${ex.message}")
             result.exception = ex
         }
         return result

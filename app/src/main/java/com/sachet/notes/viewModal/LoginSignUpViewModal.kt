@@ -1,10 +1,12 @@
 package com.sachet.notes.viewModal
 
+import android.util.JsonToken
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sachet.notes.data.LoginRequest
+import com.sachet.notes.data.Note
 import com.sachet.notes.data.User
 import com.sachet.notes.db.UserCredRepository
 import com.sachet.notes.network.NotesRepository
@@ -15,6 +17,8 @@ import com.sachet.notes.util.SignUpState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -55,10 +59,16 @@ class LoginSignUpViewModal
             try{
                 val loginRequest = LoginRequest(loginState.value.userName, loginState.value.password)
                 val token = userRepository.loginUser(loginRequest)
-                _state.value = state.value.copy(
-                    token = token
-                )
                 userCredRepository.saveToken(token)
+                _state.value = state.value.copy(
+                        token = token
+                )
+                notesRepository.getAllNotes("Bearer $token").also {
+                    _state.value = state.value.copy(
+                        token = token,
+                        noteList = it
+                    )
+                }
             }catch (ex: CancellationException){
                 _state.value = state.value.copy(
                     ex = ex.localizedMessage
@@ -66,6 +76,16 @@ class LoginSignUpViewModal
             }catch (ex: Exception){
                 _state.value = state.value.copy(
                     ex = ex.localizedMessage
+                )
+            }
+        }
+    }
+
+    fun getNotes(token: String){
+        viewModelScope.launch {
+            notesRepository.getAllNotes("Bearer $token").also {
+                _state.value = state.value.copy(
+                    noteList = it
                 )
             }
         }

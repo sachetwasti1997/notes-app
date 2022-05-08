@@ -4,21 +4,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sachet.notes.components.ButtonComponent
 import com.sachet.notes.components.CustomOutlinedTextFields
-import com.sachet.notes.data.LoginRequest
-import com.sachet.notes.db.UserCredDao
-import com.sachet.notes.util.AddEditNoteEvent
+import com.sachet.notes.navigation.NotesNavigation
+import com.sachet.notes.util.NoteState
 import com.sachet.notes.viewModal.LoginSignUpViewModal
 
 @Composable
@@ -29,8 +24,16 @@ fun LoginSignUpScreen(
     val token = loginSignUpViewModal.state.value.token
     if (token.isNullOrEmpty()){
         LoginScreen(loginSignUpViewModal)
+    }else if (!loginSignUpViewModal.state.value.noteList.isNullOrEmpty()){
+//        loginSignUpViewModal.getUserToken()
+        NotesNavigation(
+            NoteState(
+                notes = loginSignUpViewModal.state.value.noteList!!
+            ),
+            token
+        )
     }else{
-        loginSignUpViewModal.getUserToken()
+        loginSignUpViewModal.getNotes(token)
     }
 
 }

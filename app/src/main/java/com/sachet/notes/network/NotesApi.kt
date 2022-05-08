@@ -9,11 +9,11 @@ import kotlin.collections.ArrayList
 @Singleton
 interface NotesApi {
     @POST("save")
-    suspend fun saveNote(@Body note: Note): Note
-    @GET("{userId}")
-    suspend fun getNotesOfUser(@Path("userId") userId: String): ArrayList<Note>
+    suspend fun saveNote(@Header("Authorization") token: String?, @Body note: Note): Note
+    @GET("user")
+    suspend fun getNotesOfUser(@Header("Authorization")token: String?): ArrayList<Note>
     @GET("single/{noteId}")
-    suspend fun getNoteById(@Path("noteId") noteId: String): Note?
+    suspend fun getNoteById(@Header("Authorization") token: String?, @Path("noteId") noteId: String): Note?
     @DELETE("{noteId}")
-    suspend fun deleteNoteById(@Path("noteId")noteId: String): String
+    suspend fun deleteNoteById(@Header("Authorization") token: String?, @Path("noteId")noteId: String?): String
 }

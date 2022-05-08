@@ -32,6 +32,8 @@ class AddEditNoteViewModal
     private val _noteColor = mutableStateOf<Int>(Note.noteColors.random().toArgb())
     val noteColor : State<Int> = _noteColor
 
+    val credential = mutableStateOf("")
+
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
@@ -42,7 +44,7 @@ class AddEditNoteViewModal
         savedStateHandle.get<String>("noteId")?.let { noteId ->
             if (noteId != ""){
                 viewModelScope.launch {
-                    notesRepository.getNoteById(noteId)?.also { note ->
+                    notesRepository.getNoteById(credential.value, noteId)?.also { note ->
                         currentNoteId = note.noteId.toString()
                         _noteTitle.value = noteTitle.value.copy(
                             text = note.title,
@@ -58,6 +60,10 @@ class AddEditNoteViewModal
             }
         }
 
+    }
+
+    fun setCredential(token: String){
+        credential.value = token
     }
 
     open class UiEvent(var noteId: String?) {
@@ -94,6 +100,7 @@ class AddEditNoteViewModal
             is AddEditNoteEvent.SaveNote -> {
                 viewModelScope.launch {
                     notesRepository.saveNotes(
+                        credential.value,
                         Note(
                             noteId = if (currentNoteId != null) currentNoteId else null,
                             title = noteTitle.value.text,

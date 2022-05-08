@@ -28,52 +28,10 @@ class NotesViewModal
     private val _state = mutableStateOf(NoteState())
     val state: State<NoteState> = _state
 
-    init {
-        savedStateHandle.get<String>("noteId")?.let { noteId ->
-            viewModelScope.launch {
-                notesRepository.getNoteById(noteId)?.also { note ->
-                    val previousNote = state.value.notes.filter {
-                        it.noteId == noteId
-                    }
-                    if (previousNote.isNullOrEmpty()){
-                        val noteListNew = ArrayList(_state.value.notes)
-                        noteListNew.add(note)
-                        _state.value = state.value.copy(
-                            notes = noteListNew
-                        )
-                    }else{
-                        val newNote = previousNote[0]
-                        newNote.color = note.color
-                        newNote.description = note.description
-                        newNote.localDateTime = note.localDateTime
-                        newNote.noteId = note.noteId
-                        newNote.title = note.title
-                        newNote.userId = note.userId
-                        val noteListNew = ArrayList(_state.value.notes)
-                        noteListNew.remove(previousNote[0])
-                        noteListNew.add(note)
-                        _state.value = state.value.copy(
-                            notes = noteListNew
-                        )
-                    }
-                }
-            }
-        }
-//        getUserCred()
-    }
-
-//    fun getUserCred(){
-//        viewModelScope.launch {
-//            userCredRepository.getCred().onEach {
-//                _state.value = state.value.copy(
-//                    credential = it.authToken
-//                )
-//            }
-//        }
-//    }
+    private val credentialState = mutableStateOf("")
 
     private fun onEvent(event: NotesEvent){
-        Log.d("ONEVENT", "onEvent: ${state},,,${_state}")
+        Log.d("ONEVENT", "onEvent: ${event}")
         when(event){
             is NotesEvent.Order -> {
                 if (state.value.notesOrder::class == event.newNotesOrder::class &&
@@ -89,18 +47,18 @@ class NotesViewModal
                 }
             }
             is NotesEvent.DeleteNote -> {
-                viewModelScope.launch {
-                    val result = notesRepository.deleteNote(event.note.noteId!!)
-                    println(result)
-                    if (result.data != null){
-                        val newNote = _state.value.notes.filter {
-                            it.noteId != result.data
-                        }
-                        _state.value = state.value.copy(
-                            notes = newNote
-                        )
-                    }
-                }
+//                viewModelScope.launch {
+//                    println("DELETE ${credentialState.value} ${event.note.noteId}")
+//                    val result = notesRepository.deleteNote(credentialState.value, event.note.noteId)
+//                    if (result.data != null){
+//                        val newNote = _state.value.notes.filter {
+//                            it.noteId != result.data
+//                        }
+//                        _state.value = state.value.copy(
+//                            notes = newNote
+//                        )
+//                    }
+//                }
             }
             is NotesEvent.RestoreNotes -> {
 
@@ -113,13 +71,15 @@ class NotesViewModal
         }
     }
 
-    fun setNotes(noteList: State<NoteState>){
+    fun setNotes(credential: String, noteList: NoteState){
+        println("SETTING $credential")
         _state.value = state.value.copy(
-            notes = noteList.value.notes,
-            notesOrder = noteList.value.notesOrder,
-            isOrderSectionVisible = noteList.value.isOrderSectionVisible,
-            ex = noteList.value.ex
+            notes = noteList.notes,
+            notesOrder = noteList.notesOrder,
+            isOrderSectionVisible = noteList.isOrderSectionVisible,
+            ex = noteList.ex
         )
+        credentialState.value = credential
     }
 
     fun toggleNotesOrder(notesEvent: NotesEvent){
@@ -134,10 +94,53 @@ class NotesViewModal
         }
     }
 
-    fun deleteNote(note: Note){
+    fun deleteNote(credential: String,note: Note){
 //        viewModelScope.launch{
-            onEvent(NotesEvent.DeleteNote(note))
+//            onEvent(NotesEvent.DeleteNote(note))
 //        }
+        viewModelScope.launch {
+            println("DELETE ${credential} ${note.noteId}")
+            val result = notesRepository.deleteNote(credential, note.noteId)
+            if (result.data != null){
+                val newNote = _state.value.notes.filter {
+                    it.noteId != result.data
+                }
+                _state.value = state.value.copy(
+                    notes = newNote
+                )
+            }
+        }
+    }
+
+    fun addNewNote(noteId: String, credential: String){
+        viewModelScope.launch {
+            notesRepository.getNoteById(credential, noteId)?.also { note ->
+                val previousNote = state.value.notes.filter {
+                    it.noteId == noteId
+                }
+                if (previousNote.isNullOrEmpty()){
+                    val noteListNew = ArrayList(_state.value.notes)
+                    noteListNew.add(note)
+                    _state.value = state.value.copy(
+                        notes = noteListNew
+                    )
+                }else{
+                    val newNote = previousNote[0]
+                    newNote.color = note.color
+                    newNote.description = note.description
+                    newNote.localDateTime = note.localDateTime
+                    newNote.noteId = note.noteId
+                    newNote.title = note.title
+                    newNote.userId = note.userId
+                    val noteListNew = ArrayList(_state.value.notes)
+                    noteListNew.remove(previousNote[0])
+                    noteListNew.add(note)
+                    _state.value = state.value.copy(
+                        notes = noteListNew
+                    )
+                }
+            }
+        }
     }
 
 }

@@ -36,13 +36,18 @@ import kotlinx.coroutines.launch
 fun CreateNoteScreen(
     navController: NavController,
     noteColor : Int,
+    credential: String ?= null,
+    noteId: String ?= null,
     viewModel: AddEditNoteViewModal = hiltViewModel()
 ){
     val title = viewModel.noteTitle.value
     val content = viewModel.noteContent.value
+    if (viewModel.credential.value.isEmpty()){
+        if (credential != null) {
+            viewModel.setCredential("Bearer $credential")
+        }
+    }
     val scaffoldState = rememberScaffoldState()
-    println(if (noteColor != -1)Color(noteColor)else -1)
-    println(viewModel.noteColor.value)
     val noteBackgroundAnimatable = remember {
         Animatable(
             Color(viewModel.noteColor.value)

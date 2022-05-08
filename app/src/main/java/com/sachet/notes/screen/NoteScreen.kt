@@ -28,17 +28,20 @@ import com.sachet.notes.viewModal.NotesViewModal
 @Composable
 fun NoteScreen(
     navController: NavController,
-    noteList: State<NoteState>,
+    noteList: NoteState,
     noteId: String?,
+    token: String,
     viewModal: NotesViewModal = hiltViewModel()
 ){
 
     val state = viewModal.state.value
     if (state.notes.isEmpty() && state.ex == null){
-        viewModal.setNotes(noteList)
+        viewModal.setNotes(credential = "Bearer $token", noteList)
     }
-    println("NNN $noteList")
-
+    if(noteId?.isNotEmpty() == true){
+        viewModal.addNewNote(noteId = noteId, credential = "Bearer $token")
+    }
+    println("NOTEReceived $noteId")
     val scaffoldState = rememberScaffoldState()
 
     if (state.ex != null){
@@ -119,7 +122,7 @@ fun NoteScreen(
                                 )
                             },
                         onDeleteClick = {
-                            viewModal.deleteNote(note)
+                            viewModal.deleteNote(credential = "Bearer $token",note)
                         }
                     )
                 }

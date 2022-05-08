@@ -21,7 +21,6 @@ class MainViewModal
     val state: State<NoteState> = _state
 
     init {
-        println("INIT CALLED")
         getAllNoteOfUser("user1")
     }
 
