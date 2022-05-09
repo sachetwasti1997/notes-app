@@ -31,7 +31,7 @@ class NotesRepository
     }
 
     suspend fun getAllNotes(
-        token: String,
+        token: String?,
     ): ArrayList<Note>{
 //        var noteList = ArrayList<Note>()
 //        try {

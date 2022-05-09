@@ -24,16 +24,10 @@ fun LoginSignUpScreen(
     val token = loginSignUpViewModal.state.value.token
     if (token.isNullOrEmpty()){
         LoginScreen(loginSignUpViewModal)
-    }else if (!loginSignUpViewModal.state.value.noteList.isNullOrEmpty()){
-//        loginSignUpViewModal.getUserToken()
+    }else {
         NotesNavigation(
-            NoteState(
-                notes = loginSignUpViewModal.state.value.noteList!!
-            ),
             token
         )
-    }else{
-        loginSignUpViewModal.getNotes(token)
     }
 
 }

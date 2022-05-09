@@ -9,10 +9,9 @@ import androidx.lifecycle.viewModelScope
 import com.sachet.notes.data.Note
 import com.sachet.notes.db.UserCredRepository
 import com.sachet.notes.network.NotesRepository
-import com.sachet.notes.util.NoteState
-import com.sachet.notes.util.NotesEvent
-import com.sachet.notes.util.orderBy
+import com.sachet.notes.util.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,6 +28,28 @@ class NotesViewModal
     val state: State<NoteState> = _state
 
     private val credentialState = mutableStateOf("")
+
+    init {
+        viewModelScope.launch {
+            try {
+                val token = userCredRepository.getCred()
+                val allNotes = notesRepository.getAllNotes("Bearer ${token?.authToken}")
+                _state.value = state.value.copy(
+                    notes = allNotes,
+                    notesOrder = NotesOrder.Date(orderType = OrderType.Ascending),
+                    ex = null
+                )
+            }catch (ex: CancellationException){
+                _state.value = state.value.copy(
+                    ex = ex.localizedMessage
+                )
+            }catch (ex: Exception){
+                _state.value = state.value.copy(
+                    ex = ex.localizedMessage
+                )
+            }
+        }
+    }
 
     private fun onEvent(event: NotesEvent){
         Log.d("ONEVENT", "onEvent: ${event}")
@@ -77,7 +98,8 @@ class NotesViewModal
             notes = noteList.notes,
             notesOrder = noteList.notesOrder,
             isOrderSectionVisible = noteList.isOrderSectionVisible,
-            ex = noteList.ex
+            ex = noteList.ex,
+            initialStateSet = true
         )
         credentialState.value = credential
     }
@@ -105,6 +127,7 @@ class NotesViewModal
                 val newNote = _state.value.notes.filter {
                     it.noteId != result.data
                 }
+                println("NOT AFTER DELETE $newNote")
                 _state.value = state.value.copy(
                     notes = newNote
                 )
@@ -115,14 +138,19 @@ class NotesViewModal
     fun addNewNote(noteId: String, credential: String){
         viewModelScope.launch {
             notesRepository.getNoteById(credential, noteId)?.also { note ->
-                val previousNote = state.value.notes.filter {
+                println("STATE GET NOTE ${_state.value.notes}")
+                val dummyNote = ArrayList(_state.value.notes)
+                val previousNote = dummyNote.filter {
                     it.noteId == noteId
                 }
+                println("PREVIOUS $previousNote")
                 if (previousNote.isNullOrEmpty()){
                     val noteListNew = ArrayList(_state.value.notes)
                     noteListNew.add(note)
+                    println("BEFOR ADDING $noteListNew")
                     _state.value = state.value.copy(
-                        notes = noteListNew
+                        notes = noteListNew,
+                        ex = null
                     )
                 }else{
                     val newNote = previousNote[0]
@@ -136,7 +164,8 @@ class NotesViewModal
                     noteListNew.remove(previousNote[0])
                     noteListNew.add(note)
                     _state.value = state.value.copy(
-                        notes = noteListNew
+                        notes = noteListNew,
+                        ex = null
                     )
                 }
             }

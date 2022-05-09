@@ -17,7 +17,7 @@ import com.sachet.notes.screen.NoteScreen
 import com.sachet.notes.util.NoteState
 
 @Composable
-fun NotesNavigation(noteList: NoteState, token: String){
+fun NotesNavigation(token: String){
     val navController = rememberNavController()
     NavHost(
         navController = navController,
@@ -35,7 +35,7 @@ fun NotesNavigation(noteList: NoteState, token: String){
             )
         ){
             val noteId = it.arguments?.getString("noteId")
-            NoteScreen(navController = navController, noteList = noteList, noteId = noteId, token = token)
+            NoteScreen(navController = navController, noteId = noteId, token = token)
         }
         composable(
             route = NotesScreen.CreateNotesScreen.name

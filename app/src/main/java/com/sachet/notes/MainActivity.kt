@@ -38,17 +38,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainApp(application: Application,viewModal: MainViewModal = hiltViewModel()){
-    val noteList = viewModal.state
-//    println("Main $noteList")
-//    Surface(
-//        modifier = Modifier.fillMaxSize(),
-//        color = MaterialTheme.colors.background
-//    ) {
-//        NotesNavigation(
-//            noteList,
-//        )
-//    }
-//    val userCredDao = UserCredDatabase.getInstance(application).userCredDao
     LoginSignUpScreen()
 }
 
