@@ -88,7 +88,6 @@ class LoginSignUpViewModal
 
             }catch (ex: java.lang.Exception){
 //            Log.d("Notes", "saveNotes: $ex")
-                println("EXCEPTION ${ex.message}")
                 if(ex.message?.contains("404") == true){
                     _state.value = state.value.copy(
                         ex = "Cannot find notes for the user"

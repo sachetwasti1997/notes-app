@@ -40,7 +40,6 @@ fun NoteScreen(
 //    if(noteId?.isNotEmpty() == true){
 //        viewModal.addNewNote(noteId = noteId, credential = "Bearer $token")
 //    }
-    println("NOTEReceived ${viewModal.state.value.notes}")
     val scaffoldState = rememberScaffoldState()
 
     if (state.ex != null){

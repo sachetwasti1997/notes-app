@@ -49,15 +49,12 @@ class NotesRepository
         noteId: String
     ): Note?{
         var note: Note? = null
-        println("$token $noteId")
         try {
                note = notesApi.getNoteById(token, noteId)
         }catch (ex: CancellationException){
-            println(ex.message)
-//            Log.d("Notes", "saveNotes: $ex")
+              Log.d("Notes", "saveNotes: $ex")
         }catch (ex: Exception){
-            println(ex.message)
-//            Log.d("Notes", "saveNotes: $ex")
+              Log.d("Notes", "saveNotes: $ex")
         }
         return note
     }
@@ -67,10 +64,8 @@ class NotesRepository
         try {
             result.data = notesApi.deleteNoteById(token, noteId)
         }catch (ex: CancellationException){
-            println("DELETE ${ex.message}")
             result.exception = ex
         }catch (ex: Exception){
-            println("DELETE ${ex.message}")
             result.exception = ex
         }
         return result

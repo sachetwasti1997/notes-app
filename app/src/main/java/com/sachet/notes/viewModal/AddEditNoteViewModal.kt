@@ -7,6 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sachet.notes.data.Note
+import com.sachet.notes.db.UserCredRepository
 import com.sachet.notes.network.NotesRepository
 import com.sachet.notes.util.AddEditNoteEvent
 import com.sachet.notes.util.NotesTextFieldState
@@ -20,6 +21,7 @@ import javax.inject.Inject
 class AddEditNoteViewModal
 @Inject constructor(
     private val notesRepository: NotesRepository,
+    private val userCredRepository: UserCredRepository,
     savedStateHandle: SavedStateHandle
 ) :ViewModel() {
 
@@ -44,7 +46,8 @@ class AddEditNoteViewModal
         savedStateHandle.get<String>("noteId")?.let { noteId ->
             if (noteId != ""){
                 viewModelScope.launch {
-                    notesRepository.getNoteById(credential.value, noteId)?.also { note ->
+                    val token = userCredRepository.getCred()
+                    notesRepository.getNoteById("Bearer ${token?.authToken}", noteId)?.also { note ->
                         currentNoteId = note.noteId.toString()
                         _noteTitle.value = noteTitle.value.copy(
                             text = note.title,

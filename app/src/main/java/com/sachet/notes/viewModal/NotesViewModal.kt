@@ -69,7 +69,6 @@ class NotesViewModal
             }
             is NotesEvent.DeleteNote -> {
 //                viewModelScope.launch {
-//                    println("DELETE ${credentialState.value} ${event.note.noteId}")
 //                    val result = notesRepository.deleteNote(credentialState.value, event.note.noteId)
 //                    if (result.data != null){
 //                        val newNote = _state.value.notes.filter {
@@ -93,7 +92,6 @@ class NotesViewModal
     }
 
     fun setNotes(credential: String, noteList: NoteState){
-        println("SETTING $credential")
         _state.value = state.value.copy(
             notes = noteList.notes,
             notesOrder = noteList.notesOrder,
@@ -121,13 +119,11 @@ class NotesViewModal
 //            onEvent(NotesEvent.DeleteNote(note))
 //        }
         viewModelScope.launch {
-            println("DELETE ${credential} ${note.noteId}")
             val result = notesRepository.deleteNote(credential, note.noteId)
             if (result.data != null){
                 val newNote = _state.value.notes.filter {
                     it.noteId != result.data
                 }
-                println("NOT AFTER DELETE $newNote")
                 _state.value = state.value.copy(
                     notes = newNote
                 )
@@ -138,16 +134,13 @@ class NotesViewModal
     fun addNewNote(noteId: String, credential: String){
         viewModelScope.launch {
             notesRepository.getNoteById(credential, noteId)?.also { note ->
-                println("STATE GET NOTE ${_state.value.notes}")
                 val dummyNote = ArrayList(_state.value.notes)
                 val previousNote = dummyNote.filter {
                     it.noteId == noteId
                 }
-                println("PREVIOUS $previousNote")
                 if (previousNote.isNullOrEmpty()){
                     val noteListNew = ArrayList(_state.value.notes)
                     noteListNew.add(note)
-                    println("BEFOR ADDING $noteListNew")
                     _state.value = state.value.copy(
                         notes = noteListNew,
                         ex = null
