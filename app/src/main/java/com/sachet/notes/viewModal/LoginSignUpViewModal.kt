@@ -11,6 +11,7 @@ import com.sachet.notes.data.User
 import com.sachet.notes.db.UserCredRepository
 import com.sachet.notes.network.NotesRepository
 import com.sachet.notes.network.UserRepository
+import com.sachet.notes.util.LoginSignUpEvent
 import com.sachet.notes.util.LoginState
 import com.sachet.notes.util.RegisterState
 import com.sachet.notes.util.SignUpState
@@ -41,6 +42,11 @@ class LoginSignUpViewModal
     private var _signUpState = mutableStateOf(SignUpState())
     var signUpState: State<SignUpState> = _signUpState
 
+    private val _eventFlow = MutableSharedFlow<LoginSignUpEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
+    val toggleLoginSignupScreen = mutableStateOf(false)
+
     init {
         getUserToken()
     }
@@ -58,19 +64,26 @@ class LoginSignUpViewModal
         viewModelScope.launch {
             try{
                 val loginRequest = LoginRequest(loginState.value.userName, loginState.value.password)
+                println("$loginRequest LOGINREQ")
                 val token = userRepository.loginUser(loginRequest)
                 userCredRepository.saveToken(token)
                 _state.value = state.value.copy(
                         token = token
                 )
             }catch (ex: CancellationException){
-                _state.value = state.value.copy(
-                    ex = ex.localizedMessage
-                )
+                println(ex.localizedMessage)
+                var message = "There is an error!"
+                if (ex.message?.contains("Failed to connect") == true){
+                    message = "Looks Like server is down"
+                }
+                _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = message))
             }catch (ex: Exception){
-                _state.value = state.value.copy(
-                    ex = ex.localizedMessage
-                )
+                println(ex.localizedMessage)
+                var message = "There is an error!"
+                if (ex.message?.contains("Failed to connect") == true){
+                    message = "Looks Like server is down"
+                }
+                _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = message))
             }
         }
     }
@@ -108,6 +121,12 @@ class LoginSignUpViewModal
     fun changePassword(password: String){
         _loginState.value = loginState.value.copy(
             password = password
+        )
+    }
+
+    fun changeLoginPasswordVisibility(){
+        _loginState.value = loginState.value.copy(
+            passwordVisibility = !_loginState.value.passwordVisibility
         )
     }
 
