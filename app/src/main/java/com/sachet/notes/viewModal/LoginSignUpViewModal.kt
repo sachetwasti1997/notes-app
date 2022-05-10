@@ -65,11 +65,15 @@ class LoginSignUpViewModal
             try{
                 val loginRequest = LoginRequest(loginState.value.userName, loginState.value.password)
                 println("$loginRequest LOGINREQ")
-                val token = userRepository.loginUser(loginRequest)
-                userCredRepository.saveToken(token)
-                _state.value = state.value.copy(
-                        token = token
-                )
+                val loginResponse = userRepository.loginUser(loginRequest)
+                if (loginResponse.exception == null){
+                    userCredRepository.saveToken(loginResponse.token!!)
+                    _state.value = state.value.copy(
+                        token = loginResponse.token
+                    )
+                }else{
+                    _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = loginResponse.exception))
+                }
             }catch (ex: CancellationException){
                 println(ex.localizedMessage)
                 var message = "There is an error!"

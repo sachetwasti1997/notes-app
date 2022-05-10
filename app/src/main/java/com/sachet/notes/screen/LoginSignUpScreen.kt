@@ -38,7 +38,7 @@ fun LoginSignUpScreen(
                 is LoginSignUpEvent.ErrorEvent -> {
                     state.snackbarHostState.showSnackbar(
                         message = event.message!!,
-                        actionLabel = "Please try again later!"
+                        actionLabel = event.actionMessage
                     )
                 }
             }
