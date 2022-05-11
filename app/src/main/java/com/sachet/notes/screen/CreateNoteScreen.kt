@@ -58,6 +58,8 @@ fun CreateNoteScreen(
         viewModel.eventFlow.collectLatest { event ->
             when(event) {
                 is AddEditNoteViewModal.UiEvent.SaveNote -> {
+                    navController.popBackStack()
+                    navController.popBackStack()
                     navController.navigate(NotesScreen.HomeScreen.name+"?noteId=${event.noteId}")
                 }
             }

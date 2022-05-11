@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sachet.notes.components.ButtonComponent
 import com.sachet.notes.components.CustomOutlinedTextFields
+import com.sachet.notes.components.CustomRadioButton
 import com.sachet.notes.navigation.NotesNavigation
 import com.sachet.notes.util.LoginSignUpEvent
 import com.sachet.notes.util.NoteState
@@ -30,12 +31,19 @@ fun LoginSignUpScreen(
 ) {
 
     val token = loginSignUpViewModal.state.value.token
+    val loginSignUp = loginSignUpViewModal.toggleLoginSignupScreen.value
     val state = rememberScaffoldState()
 
     LaunchedEffect(state.snackbarHostState){
         loginSignUpViewModal.eventFlow.collectLatest {event ->
             when(event){
                 is LoginSignUpEvent.ErrorEvent -> {
+                    state.snackbarHostState.showSnackbar(
+                        message = event.message!!,
+                        actionLabel = event.actionMessage
+                    )
+                }
+                is LoginSignUpEvent.SuccessEvent -> {
                     state.snackbarHostState.showSnackbar(
                         message = event.message!!,
                         actionLabel = event.actionMessage
@@ -49,7 +57,32 @@ fun LoginSignUpScreen(
         scaffoldState = state
     ) {
         if (token.isNullOrEmpty()){
-            LoginScreen(loginSignUpViewModal)
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    CustomRadioButton(
+                        selected = loginSignUpViewModal.toggleLoginSignupScreen.value,
+                        onClick = {loginSignUpViewModal.changeLoginSignUpScreen(true)}
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "LOGIN", style = TextStyle(fontWeight = FontWeight.Bold))
+                    CustomRadioButton(
+                        selected = !loginSignUpViewModal.toggleLoginSignupScreen.value,
+                        onClick = {loginSignUpViewModal.changeLoginSignUpScreen(false)}
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "SIGN UP", style = TextStyle(fontWeight = FontWeight.Bold))
+                }
+                if (loginSignUp) LoginScreen(loginSignUpViewModal)
+                else SignUpScreen()
+            }
         }else {
             NotesNavigation(
                 token
@@ -65,7 +98,7 @@ fun LoginScreen(
 ){
     var userName = loginSignUpViewModal.loginState.value.userName
     var password = loginSignUpViewModal.loginState.value.password
-    var passwordVisibility = loginSignUpViewModal.loginState.value.passwordVisibility
+    var passwordVisibility = loginSignUpViewModal.passwordVisibility
 
     Surface(
         modifier = Modifier
@@ -103,11 +136,11 @@ fun LoginScreen(
                     color = MaterialTheme.colors.onSurface,
                     fontWeight = FontWeight.Bold,
                 ),
-                visualTransformation = if (!passwordVisibility)PasswordVisualTransformation()
+                visualTransformation = if (!passwordVisibility.value)PasswordVisualTransformation()
                                        else VisualTransformation.None
             ){
                 IconButton(onClick = { loginSignUpViewModal.changeLoginPasswordVisibility() }) {
-                    if (passwordVisibility) Icon(
+                    if (passwordVisibility.value) Icon(
                         imageVector = Icons.Default.Visibility,
                         contentDescription = "visible"
                     )
@@ -129,6 +162,8 @@ fun LoginScreen(
         }
     }
 }
+
+
 
 
 

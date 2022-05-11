@@ -46,6 +46,7 @@ class LoginSignUpViewModal
     val eventFlow = _eventFlow.asSharedFlow()
 
     val toggleLoginSignupScreen = mutableStateOf(false)
+    var passwordVisibility = mutableStateOf(false)
 
     init {
         getUserToken()
@@ -64,7 +65,6 @@ class LoginSignUpViewModal
         viewModelScope.launch {
             try{
                 val loginRequest = LoginRequest(loginState.value.userName, loginState.value.password)
-                println("$loginRequest LOGINREQ")
                 val loginResponse = userRepository.loginUser(loginRequest)
                 if (loginResponse.exception == null){
                     userCredRepository.saveToken(loginResponse.token!!)
@@ -114,7 +114,48 @@ class LoginSignUpViewModal
         }
     }
 
-    fun signUpUser(user: User){}
+    fun signUpUser(){
+        viewModelScope.launch {
+            try {
+                val user = User(
+                    firstName = signUpState.value.firstName,
+                    lastName = signUpState.value.lastName,
+                    email = signUpState.value.email,
+                    userName = signUpState.value.userName,
+                    password = signUpState.value.password
+                )
+                val signUpResponse = userRepository.saveUser(user)
+                println(signUpResponse)
+                if (signUpResponse.code != 200){
+                    _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = signUpResponse.message))
+                }else{
+                    _eventFlow.emit(LoginSignUpEvent.SuccessEvent(message = signUpResponse.message))
+                    _signUpState.value = signUpState.value.copy(
+                        firstName = "",
+                        lastName = "",
+                        userName = "",
+                        email = "",
+                        password = ""
+                    )
+                    toggleLoginSignupScreen.value = true
+                }
+            }catch (ex: CancellationException){
+                println(ex.localizedMessage)
+                var message = "There is an error!"
+                if (ex.message?.contains("Failed to connect") == true){
+                    message = "Looks Like server is down"
+                }
+                _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = message))
+            }catch (ex: Exception){
+                println(ex.localizedMessage)
+                var message = "There is an error!"
+                if (ex.message?.contains("Failed to connect") == true){
+                    message = "Looks Like server is down"
+                }
+                _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = message))
+            }
+        }
+    }
 
     fun changeUserName(userName: String){
         _loginState.value = loginState.value.copy(
@@ -129,8 +170,42 @@ class LoginSignUpViewModal
     }
 
     fun changeLoginPasswordVisibility(){
-        _loginState.value = loginState.value.copy(
-            passwordVisibility = !_loginState.value.passwordVisibility
+        passwordVisibility.value = !passwordVisibility.value
+    }
+
+    fun changeLoginSignUpScreen(bool: Boolean){
+        if (toggleLoginSignupScreen.value != bool){
+            toggleLoginSignupScreen.value = bool
+        }
+    }
+
+    fun changeFirstName(firstName: String){
+        _signUpState.value = signUpState.value.copy(
+            firstName = firstName
+        )
+    }
+
+    fun changeLastName(lastName: String){
+        _signUpState.value = signUpState.value.copy(
+            lastName = lastName
+        )
+    }
+
+    fun changeEmail(email: String){
+        _signUpState.value = signUpState.value.copy(
+            email = email
+        )
+    }
+
+    fun changeUserNameSignUp(userName: String){
+        _signUpState.value = signUpState.value.copy(
+            userName = userName
+        )
+    }
+
+    fun changePasswordSignUp(password: String){
+        _signUpState.value = signUpState.value.copy(
+            password = password
         )
     }
 

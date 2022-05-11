@@ -2,6 +2,7 @@ package com.sachet.notes.network
 
 import com.sachet.notes.data.LoginRequest
 import com.sachet.notes.data.User
+import com.sachet.notes.model.SignUpResponse
 import com.sachet.notes.util.LoginResponse
 import javax.inject.Inject
 
@@ -9,7 +10,7 @@ class UserRepository
 @Inject constructor(
     private val userApi: UserApi
 ){
-    suspend fun saveUser(user: User): User{
+    suspend fun saveUser(user: User): SignUpResponse {
         return userApi.saveUser(user)
     }
 

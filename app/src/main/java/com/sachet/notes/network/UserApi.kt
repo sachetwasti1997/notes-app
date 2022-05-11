@@ -2,6 +2,7 @@ package com.sachet.notes.network
 
 import com.sachet.notes.data.LoginRequest
 import com.sachet.notes.data.User
+import com.sachet.notes.model.SignUpResponse
 import com.sachet.notes.util.LoginResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -11,8 +12,8 @@ import javax.inject.Singleton
 @Singleton
 interface UserApi {
 
-    @POST
-    suspend fun saveUser(@Body user: User): User
+    @POST("save")
+    suspend fun saveUser(@Body user: User): SignUpResponse
     @POST("login")
     suspend fun loginUser(@Body loginRequest: LoginRequest): LoginResponse
     @GET("/profile")
