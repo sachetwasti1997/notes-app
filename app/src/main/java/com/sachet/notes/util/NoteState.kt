@@ -8,5 +8,6 @@ data class NoteState(
     var notesOrder: NotesOrder = NotesOrder.Date(OrderType.Ascending),
     val isOrderSectionVisible: Boolean = false,
     val ex: String? = null,
-    val initialStateSet: Boolean ?= false
+    val initialStateSet: Boolean ?= false,
+    val credential: String? = ""
 )

@@ -1,37 +1,37 @@
 package com.sachet.notes.screen
 
-import android.graphics.drawable.Icon
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.sachet.notes.components.ButtonComponent
 import com.sachet.notes.components.CustomOutlinedTextFields
 import com.sachet.notes.components.CustomRadioButton
-import com.sachet.notes.navigation.NotesNavigation
+import com.sachet.notes.navigation.NotesScreen
 import com.sachet.notes.util.LoginSignUpEvent
-import com.sachet.notes.util.NoteState
 import com.sachet.notes.viewModal.LoginSignUpViewModal
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LoginSignUpScreen(
+    navController: NavController,
     loginSignUpViewModal: LoginSignUpViewModal = hiltViewModel(),
 ) {
 
     val token = loginSignUpViewModal.state.value.token
     val loginSignUp = loginSignUpViewModal.toggleLoginSignupScreen.value
+    val isTokenExtracted = loginSignUpViewModal.state.value.isTokenExtracted
     val state = rememberScaffoldState()
 
     LaunchedEffect(state.snackbarHostState){
@@ -43,11 +43,25 @@ fun LoginSignUpScreen(
                         actionLabel = event.actionMessage
                     )
                 }
-                is LoginSignUpEvent.SuccessEvent -> {
+                is LoginSignUpEvent.SuccessEventSignUp -> {
                     state.snackbarHostState.showSnackbar(
                         message = event.message!!,
                         actionLabel = event.actionMessage
                     )
+                }
+                is LoginSignUpEvent.SuccessEventLogIn -> {
+//                    coroutineScope {
+                        println("NAVIGATING ")
+//                        while (navController.backQueue.isEmpty()){
+//                            navController.popBackStack()
+//                        }
+                        state.snackbarHostState.showSnackbar(
+                            message = event.message
+                        )
+                        navController.navigate(NotesScreen.HomeScreen.name){
+                            popUpTo(NotesScreen.LoginScreen.name)
+                        }
+//                    }
                 }
             }
         }
@@ -56,6 +70,9 @@ fun LoginSignUpScreen(
     Scaffold(
         scaffoldState = state
     ) {
+        if (token.isNullOrEmpty() && !isTokenExtracted){
+            loginSignUpViewModal.getUserToken()
+        }
         if (token.isNullOrEmpty()){
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -83,14 +100,14 @@ fun LoginSignUpScreen(
                 if (loginSignUp) LoginScreen(loginSignUpViewModal)
                 else SignUpScreen()
             }
-        }else {
-            NotesNavigation(
-                token
-            )
         }
+//        }
+//        else {
+//            navController.navigate("${NotesScreen.HomeScreen.name}?noteId=")
+//        }
     }
-
 }
+
 
 @Composable
 fun LoginScreen(

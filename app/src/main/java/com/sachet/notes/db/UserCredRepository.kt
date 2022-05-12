@@ -15,8 +15,8 @@ class UserCredRepository(
         dao.insetToken(Security(id=0, authToken))
     }
 
-    suspend fun deleteToken(security: Security){
-        dao.deleteToken(security)
+    suspend fun deleteToken(){
+        dao.deleteToken()
     }
 
 }

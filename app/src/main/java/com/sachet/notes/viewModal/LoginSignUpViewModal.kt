@@ -1,12 +1,10 @@
 package com.sachet.notes.viewModal
 
-import android.util.JsonToken
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sachet.notes.data.LoginRequest
-import com.sachet.notes.data.Note
 import com.sachet.notes.data.User
 import com.sachet.notes.db.UserCredRepository
 import com.sachet.notes.network.NotesRepository
@@ -17,11 +15,8 @@ import com.sachet.notes.util.RegisterState
 import com.sachet.notes.util.SignUpState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -49,15 +44,33 @@ class LoginSignUpViewModal
     var passwordVisibility = mutableStateOf(false)
 
     init {
-        getUserToken()
+        println("LOGIN INIT CALLED")
+//        getUserToken()
+//        viewModelScope.launch {
+//            userCredRepository.getCred().also {
+//                if (it == null){
+//                    println("This is null")
+//                    _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = "Please Login to continue!"))
+//                }else{
+//                    _eventFlow.emit(LoginSignUpEvent.SuccessEventLogIn(message = "Logged In Successfully!"))
+//                }
+//            }
+//        }
     }
 
     fun getUserToken(){
+        _state.value = state.value.copy(
+            isTokenExtracted = true
+        )
         viewModelScope.launch {
-            var token = userCredRepository.getCred()
-            _state.value = state.value.copy(
-                token = token?.authToken
-            )
+            userCredRepository.getCred().also {
+                if (it == null){
+                    println("This is null")
+                    _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = "Please Login to continue!"))
+                }else{
+                    _eventFlow.emit(LoginSignUpEvent.SuccessEventLogIn(message = "Logged In Successfully!"))
+                }
+            }
         }
     }
 
@@ -67,10 +80,9 @@ class LoginSignUpViewModal
                 val loginRequest = LoginRequest(loginState.value.userName, loginState.value.password)
                 val loginResponse = userRepository.loginUser(loginRequest)
                 if (loginResponse.exception == null){
-                    userCredRepository.saveToken(loginResponse.token!!)
-                    _state.value = state.value.copy(
-                        token = loginResponse.token
-                    )
+                    userCredRepository.saveToken(loginResponse.token!!).also {
+                        _eventFlow.emit(LoginSignUpEvent.SuccessEventLogIn(message = "Successfully Logged in"))
+                    }
                 }else{
                     _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = loginResponse.exception))
                 }
@@ -80,36 +92,14 @@ class LoginSignUpViewModal
                 if (ex.message?.contains("Failed to connect") == true){
                     message = "Looks Like server is down"
                 }
-                _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = message))
+                _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = message, actionMessage = "Try Again later!"))
             }catch (ex: Exception){
                 println(ex.localizedMessage)
                 var message = "There is an error!"
                 if (ex.message?.contains("Failed to connect") == true){
                     message = "Looks Like server is down"
                 }
-                _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = message))
-            }
-        }
-    }
-
-    fun getNotes(token: String){
-        viewModelScope.launch {
-            try {
-                notesRepository.getAllNotes("Bearer $token").also {
-                    _state.value = state.value.copy(
-                        noteList = it
-                    )
-                }
-            }catch (ex: java.util.concurrent.CancellationException){
-//            Log.d("Notes", "saveNotes: $ex")
-
-            }catch (ex: java.lang.Exception){
-//            Log.d("Notes", "saveNotes: $ex")
-                if(ex.message?.contains("404") == true){
-                    _state.value = state.value.copy(
-                        ex = "Cannot find notes for the user"
-                    )
-                }
+                _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = message, actionMessage = "Try Again later!"))
             }
         }
     }
@@ -129,7 +119,7 @@ class LoginSignUpViewModal
                 if (signUpResponse.code != 200){
                     _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = signUpResponse.message))
                 }else{
-                    _eventFlow.emit(LoginSignUpEvent.SuccessEvent(message = signUpResponse.message))
+                    _eventFlow.emit(LoginSignUpEvent.SuccessEventSignUp(message = signUpResponse.message))
                     _signUpState.value = signUpState.value.copy(
                         firstName = "",
                         lastName = "",
@@ -145,14 +135,14 @@ class LoginSignUpViewModal
                 if (ex.message?.contains("Failed to connect") == true){
                     message = "Looks Like server is down"
                 }
-                _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = message))
+                _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = message, actionMessage = "Try Again later!"))
             }catch (ex: Exception){
                 println(ex.localizedMessage)
                 var message = "There is an error!"
                 if (ex.message?.contains("Failed to connect") == true){
                     message = "Looks Like server is down"
                 }
-                _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = message))
+                _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = message, actionMessage = "Try Again later!"))
             }
         }
     }
@@ -207,6 +197,16 @@ class LoginSignUpViewModal
         _signUpState.value = signUpState.value.copy(
             password = password
         )
+    }
+
+    fun logOut(){
+        viewModelScope.launch {
+            userCredRepository.deleteToken()
+            _state.value = state.value.copy(
+                token = null,
+            )
+            toggleLoginSignupScreen.value = false
+        }
     }
 
 }

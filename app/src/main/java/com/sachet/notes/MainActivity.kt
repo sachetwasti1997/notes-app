@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainApp(application: Application,viewModal: MainViewModal = hiltViewModel()){
-    LoginSignUpScreen()
+    NotesNavigation(token = "")
 }
 
 @Composable

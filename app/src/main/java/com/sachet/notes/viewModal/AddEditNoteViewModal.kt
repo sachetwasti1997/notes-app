@@ -34,7 +34,9 @@ class AddEditNoteViewModal
     private val _noteColor = mutableStateOf<Int>(Note.noteColors.random().toArgb())
     val noteColor : State<Int> = _noteColor
 
-    val credential = mutableStateOf("")
+    val str: String ?= null
+
+    val credential = mutableStateOf(str)
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -42,28 +44,29 @@ class AddEditNoteViewModal
     var currentNoteId : String ?= null
 
     init {
-
-        savedStateHandle.get<String>("noteId")?.let { noteId ->
-            if (noteId != ""){
                 viewModelScope.launch {
                     val token = userCredRepository.getCred()
-                    notesRepository.getNoteById("Bearer ${token?.authToken}", noteId)?.also { note ->
-                        currentNoteId = note.noteId.toString()
-                        _noteTitle.value = noteTitle.value.copy(
-                            text = note.title,
-                            isHintVisible = false
-                        )
-                        _noteContent.value = noteContent.value.copy(
-                            text = note.description,
-                            isHintVisible = false
-                        )
-                        _noteColor.value = note.color
+                    credential.value = "Bearer ${token?.authToken}"
+                    println("TOKEN ADD $token")
+                        savedStateHandle.get<String>("noteId")?.let { noteId ->
+                            if (noteId.isNotEmpty()){
+                                notesRepository.getNoteById("Bearer ${token?.authToken}", noteId)?.also { note ->
+                                    currentNoteId = note.noteId.toString()
+                                    _noteTitle.value = noteTitle.value.copy(
+                                        text = note.title,
+                                        isHintVisible = false
+                                    )
+                                    _noteContent.value = noteContent.value.copy(
+                                        text = note.description,
+                                        isHintVisible = false
+                                    )
+                                    _noteColor.value = note.color
+                            }
                     }
                 }
             }
         }
 
-    }
 
     fun setCredential(token: String){
         credential.value = token

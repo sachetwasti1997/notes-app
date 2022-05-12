@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.sachet.notes.data.Note
 import com.sachet.notes.screen.CreateNoteScreen
+import com.sachet.notes.screen.LoginSignUpScreen
 //import com.sachet.notes.screen.CreateNoteScreen
 import com.sachet.notes.screen.NoteScreen
 import com.sachet.notes.util.NoteState
@@ -21,8 +22,13 @@ fun NotesNavigation(token: String){
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = "${NotesScreen.HomeScreen.name}?noteId={noteId}",
+        startDestination = NotesScreen.LoginScreen.name,
     ){
+        composable(
+            route = NotesScreen.LoginScreen.name
+        ){
+            LoginSignUpScreen(navController = navController)
+        }
         composable(
             route = NotesScreen.HomeScreen.name+"?noteId={noteId}",
             arguments = listOf(

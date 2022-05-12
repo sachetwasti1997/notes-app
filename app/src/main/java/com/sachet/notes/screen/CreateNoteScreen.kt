@@ -29,6 +29,7 @@ import com.sachet.notes.data.Note
 import com.sachet.notes.navigation.NotesScreen
 import com.sachet.notes.util.AddEditNoteEvent
 import com.sachet.notes.viewModal.AddEditNoteViewModal
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -42,11 +43,11 @@ fun CreateNoteScreen(
 ){
     val title = viewModel.noteTitle.value
     val content = viewModel.noteContent.value
-    if (viewModel.credential.value.isEmpty()){
-        if (credential != null) {
-            viewModel.setCredential("Bearer $credential")
-        }
-    }
+//    if (viewModel.credential.value.isEmpty()){
+//        if (credential != null) {
+//            viewModel.setCredential("Bearer $credential")
+//        }
+//    }
     val scaffoldState = rememberScaffoldState()
     val noteBackgroundAnimatable = remember {
         Animatable(
@@ -58,9 +59,12 @@ fun CreateNoteScreen(
         viewModel.eventFlow.collectLatest { event ->
             when(event) {
                 is AddEditNoteViewModal.UiEvent.SaveNote -> {
-                    navController.popBackStack()
-                    navController.popBackStack()
-                    navController.navigate(NotesScreen.HomeScreen.name+"?noteId=${event.noteId}")
+                    coroutineScope {
+                        while (!navController.backQueue.isEmpty()){
+                            navController.popBackStack()
+                        }
+                        navController.navigate(NotesScreen.HomeScreen.name+"?noteId=${event.noteId}")
+                    }
                 }
             }
         }

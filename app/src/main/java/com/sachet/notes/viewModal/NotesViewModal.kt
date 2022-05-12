@@ -3,6 +3,7 @@ package com.sachet.notes.viewModal
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,9 +28,10 @@ class NotesViewModal
     private val _state = mutableStateOf(NoteState())
     val state: State<NoteState> = _state
 
-    private val credentialState = mutableStateOf("")
+    var logOut = mutableStateOf(false)
 
     init {
+        println("NOTE SCREEN")
         viewModelScope.launch {
             try {
                 val token = userCredRepository.getCred()
@@ -37,7 +39,8 @@ class NotesViewModal
                 _state.value = state.value.copy(
                     notes = allNotes,
                     notesOrder = NotesOrder.Date(orderType = OrderType.Ascending),
-                    ex = null
+                    ex = null,
+                    credential = "Bearer ${token?.authToken}"
                 )
             }catch (ex: CancellationException){
                 _state.value = state.value.copy(
@@ -67,39 +70,12 @@ class NotesViewModal
                     )
                 }
             }
-            is NotesEvent.DeleteNote -> {
-//                viewModelScope.launch {
-//                    val result = notesRepository.deleteNote(credentialState.value, event.note.noteId)
-//                    if (result.data != null){
-//                        val newNote = _state.value.notes.filter {
-//                            it.noteId != result.data
-//                        }
-//                        _state.value = state.value.copy(
-//                            notes = newNote
-//                        )
-//                    }
-//                }
-            }
-            is NotesEvent.RestoreNotes -> {
-
-            }
             is NotesEvent.ToggleOrderSelection -> {
                 _state.value = state.value.copy(
                     isOrderSectionVisible = !state.value.isOrderSectionVisible
                 )
             }
         }
-    }
-
-    fun setNotes(credential: String, noteList: NoteState){
-        _state.value = state.value.copy(
-            notes = noteList.notes,
-            notesOrder = noteList.notesOrder,
-            isOrderSectionVisible = noteList.isOrderSectionVisible,
-            ex = noteList.ex,
-            initialStateSet = true
-        )
-        credentialState.value = credential
     }
 
     fun toggleNotesOrder(notesEvent: NotesEvent){
@@ -115,11 +91,8 @@ class NotesViewModal
     }
 
     fun deleteNote(credential: String,note: Note){
-//        viewModelScope.launch{
-//            onEvent(NotesEvent.DeleteNote(note))
-//        }
         viewModelScope.launch {
-            val result = notesRepository.deleteNote(credential, note.noteId)
+            val result = notesRepository.deleteNote(state.value.credential, note.noteId)
             if (result.data != null){
                 val newNote = _state.value.notes.filter {
                     it.noteId != result.data
@@ -131,37 +104,10 @@ class NotesViewModal
         }
     }
 
-    fun addNewNote(noteId: String, credential: String){
+    fun logOut(){
         viewModelScope.launch {
-            notesRepository.getNoteById(credential, noteId)?.also { note ->
-                val dummyNote = ArrayList(_state.value.notes)
-                val previousNote = dummyNote.filter {
-                    it.noteId == noteId
-                }
-                if (previousNote.isNullOrEmpty()){
-                    val noteListNew = ArrayList(_state.value.notes)
-                    noteListNew.add(note)
-                    _state.value = state.value.copy(
-                        notes = noteListNew,
-                        ex = null
-                    )
-                }else{
-                    val newNote = previousNote[0]
-                    newNote.color = note.color
-                    newNote.description = note.description
-                    newNote.localDateTime = note.localDateTime
-                    newNote.noteId = note.noteId
-                    newNote.title = note.title
-                    newNote.userId = note.userId
-                    val noteListNew = ArrayList(_state.value.notes)
-                    noteListNew.remove(previousNote[0])
-                    noteListNew.add(note)
-                    _state.value = state.value.copy(
-                        notes = noteListNew,
-                        ex = null
-                    )
-                }
-            }
+            userCredRepository.deleteToken()
+            logOut.value = true
         }
     }
 

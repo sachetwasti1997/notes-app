@@ -8,7 +8,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,24 +25,22 @@ import com.sachet.notes.components.OrderSection
 import com.sachet.notes.navigation.NotesScreen
 import com.sachet.notes.util.NoteState
 import com.sachet.notes.util.NotesEvent
+import com.sachet.notes.viewModal.LoginSignUpViewModal
 import com.sachet.notes.viewModal.NotesViewModal
+
 
 @Composable
 fun NoteScreen(
     navController: NavController,
     noteId: String?,
     token: String,
-    viewModal: NotesViewModal = hiltViewModel()
+    viewModal: NotesViewModal = hiltViewModel(),
+    loginSignUpViewModal: LoginSignUpViewModal = hiltViewModel()
 ){
 
     val state = viewModal.state.value
-//    if (state.notes.isEmpty() && state.initialStateSet == false){
-//        viewModal.setNotes(credential = "Bearer $token", noteList)
-//    }
-//    if(noteId?.isNotEmpty() == true){
-//        viewModal.addNewNote(noteId = noteId, credential = "Bearer $token")
-//    }
     val scaffoldState = rememberScaffoldState()
+    val logOut = viewModal.logOut.value
 
     if (state.ex != null){
         LaunchedEffect(scaffoldState.snackbarHostState){
@@ -81,12 +81,20 @@ fun NoteScreen(
                     text = "My Notes",
                     style = MaterialTheme.typography.h4
                 )
-                IconButton(
-                    onClick = {
-                        viewModal.toggleOrderSection()
+                Row {
+                    IconButton(
+                        onClick = {
+                            viewModal.toggleOrderSection()
+                        }
+                    ) {
+                        Icon(imageVector = Icons.Default.Menu, contentDescription = "Sort")
                     }
-                ) {
-                    Icon(imageVector = Icons.Default.Menu, contentDescription = "Sort")
+                    IconButton(onClick = {
+                        viewModal.logOut()
+                        navController.navigate(NotesScreen.LoginScreen.name)
+                    }) {
+                        Icon(imageVector = Icons.Default.Logout, contentDescription = "Account Actions")
+                    }
                 }
             }
             AnimatedVisibility(

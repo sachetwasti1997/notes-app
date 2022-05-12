@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
 import com.sachet.notes.data.Security
 import kotlinx.coroutines.flow.Flow
+import retrofit2.http.DELETE
 
 @Dao
 interface UserCredDao {
@@ -17,7 +18,7 @@ interface UserCredDao {
     @Insert(onConflict = REPLACE)
     suspend fun insetToken(security: Security)
 
-    @Delete
-    suspend fun deleteToken(security: Security)
+    @Query("DELETE FROM security")
+    suspend fun deleteToken()
 
 }
