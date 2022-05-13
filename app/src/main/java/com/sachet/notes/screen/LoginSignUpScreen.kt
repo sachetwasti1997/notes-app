@@ -1,5 +1,6 @@
 package com.sachet.notes.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -7,6 +8,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -31,12 +33,12 @@ fun LoginSignUpScreen(
 
     val token = loginSignUpViewModal.state.value.token
     val loginSignUp = loginSignUpViewModal.toggleLoginSignupScreen.value
-    val isTokenExtracted = loginSignUpViewModal.state.value.isTokenExtracted
+    val isSearchStarted = loginSignUpViewModal.state.value.isSearchStarted
     val state = rememberScaffoldState()
 
-    LaunchedEffect(state.snackbarHostState){
-        loginSignUpViewModal.eventFlow.collectLatest {event ->
-            when(event){
+    LaunchedEffect(true) {
+        loginSignUpViewModal.eventFlow.collectLatest { event ->
+            when (event) {
                 is LoginSignUpEvent.ErrorEvent -> {
                     state.snackbarHostState.showSnackbar(
                         message = event.message!!,
@@ -49,20 +51,6 @@ fun LoginSignUpScreen(
                         actionLabel = event.actionMessage
                     )
                 }
-                is LoginSignUpEvent.SuccessEventLogIn -> {
-//                    coroutineScope {
-                        println("NAVIGATING ")
-//                        while (navController.backQueue.isEmpty()){
-//                            navController.popBackStack()
-//                        }
-                        state.snackbarHostState.showSnackbar(
-                            message = event.message
-                        )
-                        navController.navigate(NotesScreen.HomeScreen.name){
-                            popUpTo(NotesScreen.LoginScreen.name)
-                        }
-//                    }
-                }
             }
         }
     }
@@ -70,49 +58,50 @@ fun LoginSignUpScreen(
     Scaffold(
         scaffoldState = state
     ) {
-        if (token.isNullOrEmpty() && !isTokenExtracted){
-            loginSignUpViewModal.getUserToken()
-        }
-        if (token.isNullOrEmpty()){
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    CustomRadioButton(
-                        selected = loginSignUpViewModal.toggleLoginSignupScreen.value,
-                        onClick = {loginSignUpViewModal.changeLoginSignUpScreen(true)}
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "LOGIN", style = TextStyle(fontWeight = FontWeight.Bold))
-                    CustomRadioButton(
-                        selected = !loginSignUpViewModal.toggleLoginSignupScreen.value,
-                        onClick = {loginSignUpViewModal.changeLoginSignUpScreen(false)}
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "SIGN UP", style = TextStyle(fontWeight = FontWeight.Bold))
-                }
-                if (loginSignUp) LoginScreen(loginSignUpViewModal)
-                else SignUpScreen()
+        if (token?.isNotEmpty() == true) {
+            LaunchedEffect(Unit) {
+                navController.popBackStack()
+                navController.navigate(NotesScreen.HomeScreen.name + "?noteId=")
             }
         }
-//        }
-//        else {
-//            navController.navigate("${NotesScreen.HomeScreen.name}?noteId=")
-//        }
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                CustomRadioButton(
+                    selected = loginSignUpViewModal.toggleLoginSignupScreen.value,
+                    onClick = { loginSignUpViewModal.changeLoginSignUpScreen(true) }
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "LOGIN", style = TextStyle(fontWeight = FontWeight.Bold))
+                CustomRadioButton(
+                    selected = !loginSignUpViewModal.toggleLoginSignupScreen.value,
+                    onClick = { loginSignUpViewModal.changeLoginSignUpScreen(false) }
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "SIGN UP", style = TextStyle(fontWeight = FontWeight.Bold))
+            }
+            if (isSearchStarted) {
+                CircularProgressIndicator()
+            }
+            if (loginSignUp) LoginScreen(loginSignUpViewModal, navController)
+            else SignUpScreen()
+        }
     }
 }
 
 
 @Composable
 fun LoginScreen(
-    loginSignUpViewModal: LoginSignUpViewModal = hiltViewModel()
-){
+    loginSignUpViewModal: LoginSignUpViewModal = hiltViewModel(),
+    navController: NavController
+) {
     var userName = loginSignUpViewModal.loginState.value.userName
     var password = loginSignUpViewModal.loginState.value.password
     var passwordVisibility = loginSignUpViewModal.passwordVisibility
@@ -140,7 +129,7 @@ fun LoginScreen(
                     color = MaterialTheme.colors.onSurface,
                     fontWeight = FontWeight.Bold
                 ),
-            ){}
+            ) {}
             Spacer(modifier = Modifier.height(8.dp))
             CustomOutlinedTextFields(
                 text = password.toString(),
@@ -153,9 +142,9 @@ fun LoginScreen(
                     color = MaterialTheme.colors.onSurface,
                     fontWeight = FontWeight.Bold,
                 ),
-                visualTransformation = if (!passwordVisibility.value)PasswordVisualTransformation()
-                                       else VisualTransformation.None
-            ){
+                visualTransformation = if (!passwordVisibility.value) PasswordVisualTransformation()
+                else VisualTransformation.None
+            ) {
                 IconButton(onClick = { loginSignUpViewModal.changeLoginPasswordVisibility() }) {
                     if (passwordVisibility.value) Icon(
                         imageVector = Icons.Default.Visibility,

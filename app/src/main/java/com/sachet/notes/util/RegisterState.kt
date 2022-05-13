@@ -8,5 +8,5 @@ data class RegisterState(
     var isLoginPage: Boolean ?= true,
     var ex: String ?= null,
     var noteList: List<Note> ?= null,
-    var isTokenExtracted: Boolean = false
+    var isSearchStarted: Boolean = false
 )

@@ -34,13 +34,17 @@ class NotesViewModal
         println("NOTE SCREEN")
         viewModelScope.launch {
             try {
+                _state.value = state.value.copy(
+                    isSearchStarted = true
+                )
                 val token = userCredRepository.getCred()
                 val allNotes = notesRepository.getAllNotes("Bearer ${token?.authToken}")
                 _state.value = state.value.copy(
                     notes = allNotes,
                     notesOrder = NotesOrder.Date(orderType = OrderType.Ascending),
                     ex = null,
-                    credential = "Bearer ${token?.authToken}"
+                    credential = "Bearer ${token?.authToken}",
+                    isSearchStarted = false
                 )
             }catch (ex: CancellationException){
                 _state.value = state.value.copy(

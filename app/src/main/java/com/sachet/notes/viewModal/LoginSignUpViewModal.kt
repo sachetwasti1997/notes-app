@@ -45,45 +45,41 @@ class LoginSignUpViewModal
 
     init {
         println("LOGIN INIT CALLED")
-//        getUserToken()
-//        viewModelScope.launch {
-//            userCredRepository.getCred().also {
-//                if (it == null){
-//                    println("This is null")
-//                    _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = "Please Login to continue!"))
-//                }else{
-//                    _eventFlow.emit(LoginSignUpEvent.SuccessEventLogIn(message = "Logged In Successfully!"))
-//                }
-//            }
-//        }
+        getUserToken()
     }
 
     fun getUserToken(){
-        _state.value = state.value.copy(
-            isTokenExtracted = true
-        )
         viewModelScope.launch {
-            userCredRepository.getCred().also {
-                if (it == null){
-                    println("This is null")
-                    _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = "Please Login to continue!"))
-                }else{
-                    _eventFlow.emit(LoginSignUpEvent.SuccessEventLogIn(message = "Logged In Successfully!"))
-                }
-            }
+            _state.value = state.value.copy(
+                isSearchStarted = true
+            )
+            val security = userCredRepository.getCred()
+            _state.value = state.value.copy(
+                token = security?.authToken,
+                isSearchStarted = false
+            )
         }
     }
 
     fun loginUser(){
         viewModelScope.launch {
             try{
+                _state.value = state.value.copy(
+                    isSearchStarted = true
+                )
                 val loginRequest = LoginRequest(loginState.value.userName, loginState.value.password)
                 val loginResponse = userRepository.loginUser(loginRequest)
                 if (loginResponse.exception == null){
-                    userCredRepository.saveToken(loginResponse.token!!).also {
-                        _eventFlow.emit(LoginSignUpEvent.SuccessEventLogIn(message = "Successfully Logged in"))
-                    }
+                    userCredRepository.saveToken(loginResponse.token!!)
+                    _state.value = state.value.copy(
+                        token = loginResponse.token,
+                        isSearchStarted = false
+                    )
+                    _eventFlow.emit(LoginSignUpEvent.SuccessEventLogIn(message = "Logged In"))
                 }else{
+                    _state.value = state.value.copy(
+                        isSearchStarted = false
+                    )
                     _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = loginResponse.exception))
                 }
             }catch (ex: CancellationException){
@@ -144,6 +140,12 @@ class LoginSignUpViewModal
                 }
                 _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = message, actionMessage = "Try Again later!"))
             }
+        }
+    }
+
+    fun navigateToHome(){
+        viewModelScope.launch {
+            _eventFlow.emit(LoginSignUpEvent.SuccessEventLogIn(message = "Successfully Logged in"))
         }
     }
 

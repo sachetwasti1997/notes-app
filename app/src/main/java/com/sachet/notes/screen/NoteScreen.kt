@@ -34,8 +34,7 @@ fun NoteScreen(
     navController: NavController,
     noteId: String?,
     token: String,
-    viewModal: NotesViewModal = hiltViewModel(),
-    loginSignUpViewModal: LoginSignUpViewModal = hiltViewModel()
+    viewModal: NotesViewModal = hiltViewModel()
 ){
 
     val state = viewModal.state.value
@@ -91,6 +90,7 @@ fun NoteScreen(
                     }
                     IconButton(onClick = {
                         viewModal.logOut()
+                        navController.popBackStack()
                         navController.navigate(NotesScreen.LoginScreen.name)
                     }) {
                         Icon(imageVector = Icons.Default.Logout, contentDescription = "Account Actions")
@@ -112,6 +112,9 @@ fun NoteScreen(
                         .fillMaxWidth()
                         .padding(16.dp)
                 )
+            }
+            if (state.isSearchStarted){
+                CircularProgressIndicator()
             }
             Spacer(modifier = Modifier.height(16.dp))
             LazyColumn(modifier = Modifier.fillMaxSize()){

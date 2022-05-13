@@ -44,6 +44,7 @@ class AddEditNoteViewModal
     var currentNoteId : String ?= null
 
     init {
+        println("CREATE CALLED")
                 viewModelScope.launch {
                     val token = userCredRepository.getCred()
                     credential.value = "Bearer ${token?.authToken}"

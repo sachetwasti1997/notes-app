@@ -9,5 +9,6 @@ data class NoteState(
     val isOrderSectionVisible: Boolean = false,
     val ex: String? = null,
     val initialStateSet: Boolean ?= false,
-    val credential: String? = ""
+    val credential: String? = "",
+    val isSearchStarted: Boolean = false
 )
