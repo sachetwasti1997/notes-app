@@ -1,7 +1,11 @@
 package com.sachet.notes.screen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -64,34 +68,54 @@ fun LoginSignUpScreen(
                 navController.navigate(NotesScreen.HomeScreen.name + "?noteId=")
             }
         }
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(),
+            color = Color.Cyan
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+            Card(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth()
+                    .padding(top = 60.dp),
+                elevation = 20.dp,
+                shape = RoundedCornerShape(
+                    topStartPercent = 20,
+                )
             ) {
-                CustomRadioButton(
-                    selected = loginSignUpViewModal.toggleLoginSignupScreen.value,
-                    onClick = { loginSignUpViewModal.changeLoginSignUpScreen(true) }
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "LOGIN", style = TextStyle(fontWeight = FontWeight.Bold))
-                CustomRadioButton(
-                    selected = !loginSignUpViewModal.toggleLoginSignupScreen.value,
-                    onClick = { loginSignUpViewModal.changeLoginSignUpScreen(false) }
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "SIGN UP", style = TextStyle(fontWeight = FontWeight.Bold))
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth()
+                        .padding(top = 20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        CustomRadioButton(
+                            selected = loginSignUpViewModal.toggleLoginSignupScreen.value,
+                            onClick = { loginSignUpViewModal.changeLoginSignUpScreen(true) }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = "LOGIN", style = TextStyle(fontWeight = FontWeight.Bold))
+                        CustomRadioButton(
+                            selected = !loginSignUpViewModal.toggleLoginSignupScreen.value,
+                            onClick = { loginSignUpViewModal.changeLoginSignUpScreen(false) }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = "SIGN UP", style = TextStyle(fontWeight = FontWeight.Bold))
+                    }
+                    if (isSearchStarted) {
+                        CircularProgressIndicator()
+                    }
+                    if (loginSignUp) LoginScreen(loginSignUpViewModal, navController)
+                    else SignUpScreen()
+                }
             }
-            if (isSearchStarted) {
-                CircularProgressIndicator()
-            }
-            if (loginSignUp) LoginScreen(loginSignUpViewModal, navController)
-            else SignUpScreen()
         }
     }
 }
@@ -106,15 +130,10 @@ fun LoginScreen(
     var password = loginSignUpViewModal.loginState.value.password
     var passwordVisibility = loginSignUpViewModal.passwordVisibility
 
-    Surface(
-        modifier = Modifier
-            .fillMaxHeight()
-            .fillMaxWidth()
-    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(start = 20.dp, end = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -165,7 +184,6 @@ fun LoginScreen(
                 enabled = userName.isNotEmpty() && password.isNotEmpty()
             )
         }
-    }
 }
 
 

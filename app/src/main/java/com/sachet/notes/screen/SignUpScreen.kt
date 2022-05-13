@@ -28,15 +28,11 @@ fun SignUpScreen(
     val email = loginSignUpViewModal.signUpState.value.email
     val userName = loginSignUpViewModal.signUpState.value.userName
     val password = loginSignUpViewModal.signUpState.value.password
-    Surface(
-        modifier = Modifier
-            .fillMaxHeight()
-            .fillMaxWidth()
-    ) {
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(start = 20.dp, end = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ){
@@ -123,5 +119,5 @@ fun SignUpScreen(
                         && password.isNotEmpty() && email.isNotEmpty()
             )
         }
-        }
+
     }
