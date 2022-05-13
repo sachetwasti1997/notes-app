@@ -40,7 +40,7 @@ class NotesViewModal
                 val token = userCredRepository.getCred()
                 val allNotes = notesRepository.getAllNotes("Bearer ${token?.authToken}")
                 _state.value = state.value.copy(
-                    notes = allNotes,
+                    notes = orderBy(allNotes, NotesOrder.Date(OrderType.Ascending)),
                     notesOrder = NotesOrder.Date(orderType = OrderType.Ascending),
                     ex = null,
                     credential = "Bearer ${token?.authToken}",
@@ -48,11 +48,13 @@ class NotesViewModal
                 )
             }catch (ex: CancellationException){
                 _state.value = state.value.copy(
-                    ex = ex.localizedMessage
+                    ex = ex.localizedMessage,
+                    isSearchStarted = false
                 )
             }catch (ex: Exception){
                 _state.value = state.value.copy(
-                    ex = ex.localizedMessage
+                    ex = ex.localizedMessage,
+                    isSearchStarted = false
                 )
             }
         }
