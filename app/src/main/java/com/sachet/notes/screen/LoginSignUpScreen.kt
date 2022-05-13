@@ -160,7 +160,6 @@ fun LoginScreen(
             ButtonComponent(
                 text = "LOG IN",
                 onClick = {
-                    println("CLICKED")
                     loginSignUpViewModal.loginUser()
                 },
                 enabled = userName.isNotEmpty() && password.isNotEmpty()

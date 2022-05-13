@@ -44,7 +44,6 @@ class LoginSignUpViewModal
     var passwordVisibility = mutableStateOf(false)
 
     init {
-        println("LOGIN INIT CALLED")
         getUserToken()
     }
 
@@ -83,14 +82,12 @@ class LoginSignUpViewModal
                     _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = loginResponse.exception))
                 }
             }catch (ex: CancellationException){
-                println(ex.localizedMessage)
                 var message = "There is an error!"
                 if (ex.message?.contains("Failed to connect") == true){
                     message = "Looks Like server is down"
                 }
                 _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = message, actionMessage = "Try Again later!"))
             }catch (ex: Exception){
-                println(ex.localizedMessage)
                 var message = "There is an error!"
                 if (ex.message?.contains("Failed to connect") == true){
                     message = "Looks Like server is down"
@@ -111,7 +108,6 @@ class LoginSignUpViewModal
                     password = signUpState.value.password
                 )
                 val signUpResponse = userRepository.saveUser(user)
-                println(signUpResponse)
                 if (signUpResponse.code != 200){
                     _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = signUpResponse.message))
                 }else{
@@ -126,14 +122,12 @@ class LoginSignUpViewModal
                     toggleLoginSignupScreen.value = true
                 }
             }catch (ex: CancellationException){
-                println(ex.localizedMessage)
                 var message = "There is an error!"
                 if (ex.message?.contains("Failed to connect") == true){
                     message = "Looks Like server is down"
                 }
                 _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = message, actionMessage = "Try Again later!"))
             }catch (ex: Exception){
-                println(ex.localizedMessage)
                 var message = "There is an error!"
                 if (ex.message?.contains("Failed to connect") == true){
                     message = "Looks Like server is down"

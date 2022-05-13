@@ -31,7 +31,6 @@ class NotesViewModal
     var logOut = mutableStateOf(false)
 
     init {
-        println("NOTE SCREEN")
         viewModelScope.launch {
             try {
                 _state.value = state.value.copy(

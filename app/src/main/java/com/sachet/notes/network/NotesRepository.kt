@@ -14,19 +14,13 @@ class NotesRepository
 ){
 
     suspend fun saveNotes(token: String?, note: Note): Response<Note, Boolean, Exception>{
-        println("SAVING $token $note")
         val noteSaved = Response<Note, Boolean, Exception>(null, true, null)
         try {
             noteSaved.data = notesApi.saveNote(token, note)
             noteSaved.loading = false
-            println("SAVED ${noteSaved.data}")
         }catch (ex: CancellationException){
-//            Log.d("Notes", "saveNotes: $ex")
-            println(ex.message)
             throw ex
         }catch (ex: Exception){
-//            Log.d("Notes", "saveNotes: $ex")
-            println(ex.message)
             noteSaved.loading = false
             noteSaved.exception = ex
         }
