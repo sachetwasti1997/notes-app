@@ -15,8 +15,10 @@ import com.sachet.notes.model.RegisterState
 import com.sachet.notes.model.SignUpState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -51,7 +53,9 @@ class LoginSignUpViewModal
                 )
                 userCredRepository.getCred().also {security ->
                     if (security?.authToken.isNullOrEmpty()){
-                        _eventFlow.emit(LoginSignUpEvent.ErrorEvent("Please Login to continue"))
+                        println("RECEIVED NULL TOKEN")
+                        delay(100)
+                        _eventFlow.emit(LoginSignUpEvent.ErrorEvent("Please Login to continue", ""))
                         _state.value = state.value.copy(
                             isSearchStarted = false
                         )
@@ -62,7 +66,8 @@ class LoginSignUpViewModal
                             isSearchStarted = false,
                             token = security?.authToken
                         )
-//                        _eventFlow.emit(LoginSignUpEvent.SuccessEventLogIn("Successful Loggin"))
+                        delay(100)
+                        _eventFlow.emit(LoginSignUpEvent.SuccessEventLogIn("Subscribing"))
                     }
 
                 }
@@ -88,7 +93,8 @@ class LoginSignUpViewModal
                         token = loginResponse.token,
                         isSearchStarted = false
                     )
-//                    _eventFlow.emit(LoginSignUpEvent.SuccessEventLogIn(message = "Logged In"))
+//                    delay(100)
+                    _eventFlow.emit(LoginSignUpEvent.SuccessEventLogIn(message = "Logged In"))
                 }else{
                     _state.value = state.value.copy(
                         isSearchStarted = false

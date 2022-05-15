@@ -29,6 +29,7 @@ import com.sachet.notes.viewModal.LoginSignUpViewModal
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 
 @Composable
@@ -41,7 +42,6 @@ fun LoginSignUpScreen(
     val loginSignUp = loginSignUpViewModal.toggleLoginSignupScreen.value
     val isSearchStarted = loginSignUpViewModal.state.value.isSearchStarted
     val state = rememberScaffoldState()
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(true) {
         loginSignUpViewModal.eventFlow.collectLatest { event ->
@@ -58,6 +58,10 @@ fun LoginSignUpScreen(
                         actionLabel = event.actionMessage
                     )
                 }
+                is LoginSignUpEvent.SuccessEventLogIn -> {
+                    navController.popBackStack()
+                    navController.navigate(NotesScreen.HomeScreen.name)
+                }
             }
         }
     }
@@ -65,12 +69,12 @@ fun LoginSignUpScreen(
     Scaffold(
         scaffoldState = state
     ) {
-        if (token?.isNotEmpty() == true) {
-            LaunchedEffect(Unit) {
-                navController.popBackStack()
-                navController.navigate(NotesScreen.HomeScreen.name + "?noteId=")
-            }
-        }
+//        if (token?.isNotEmpty() == true) {
+//            LaunchedEffect(Unit) {
+//                navController.popBackStack()
+//                navController.navigate(NotesScreen.HomeScreen.name + "?noteId=")
+//            }
+//        }
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
