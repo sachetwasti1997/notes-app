@@ -16,8 +16,8 @@ import com.sachet.notes.network.NotesRepository
 import com.sachet.notes.util.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,8 +31,8 @@ class NotesViewModal
 
     private val _state = mutableStateOf(NoteState())
     val state: State<NoteState> = _state
-    private val _eventFlow = MutableSharedFlow<NotesEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    private val _eventFlow = Channel<NotesEvent>()
+    val eventFlow = _eventFlow.receiveAsFlow()
 
     var logOut = mutableStateOf(false)
 
@@ -53,8 +53,8 @@ class NotesViewModal
                         isSearchStarted = false
                     )
                 }else{
-                    println("FAILURE EVENT $allNotes")
-                    _eventFlow.emit(NotesEvent.FetchNotesEventFailure(allNotes.message))
+//                    println("FAILURE EVENT $allNotes")
+                    _eventFlow.send(NotesEvent.FailureEvent(allNotes.message))
                     _state.value = state.value.copy(
                         isSearchStarted = false
                     )
@@ -65,12 +65,19 @@ class NotesViewModal
 //                        hasJwtExpired = true,
 //                        isSearchStarted = false
 //                    )
-                    _eventFlow.emit(NotesEvent.TokenExpiredFailure())
+                    _eventFlow.send(NotesEvent.TokenExpiredFailure("Session Expired, please login again to continue!"))
+                }else if (ex.message?.contains("Failed to connect") == true){
+//                    _state.value = state.value.copy(
+//                        ex = ex.localizedMessage,
+//                        isSearchStarted = false
+//                    )
+                    _eventFlow.send(NotesEvent.FailureEvent(message = "Looks like the server is down, try again later"))
                 }else{
-                    _state.value = state.value.copy(
-                        ex = ex.localizedMessage,
-                        isSearchStarted = false
-                    )
+//                    _state.value = state.value.copy(
+//                        ex = ex.localizedMessage,
+//                        isSearchStarted = false
+//                    )
+                    _eventFlow.send(NotesEvent.FailureEvent(message = "Failed with ${ex.message}"))
                 }
             }catch (ex: Exception){
                 if (ex.message?.contains("401") == true){
@@ -78,12 +85,19 @@ class NotesViewModal
 //                        hasJwtExpired = true,
 //                        isSearchStarted = false
 //                    )
-                    _eventFlow.emit(NotesEvent.TokenExpiredFailure())
+                    _eventFlow.send(NotesEvent.TokenExpiredFailure("Session Expired, please login again to continue!"))
+                }else if (ex.message?.contains("Failed to connect") == true){
+//                    _state.value = state.value.copy(
+//                        ex = ex.localizedMessage,
+//                        isSearchStarted = false
+//                    )
+                    _eventFlow.send(NotesEvent.FailureEvent(message = "Looks like the server is down, try again later"))
                 }else{
-                    _state.value = state.value.copy(
-                        ex = ex.localizedMessage,
-                        isSearchStarted = false
-                    )
+//                    _state.value = state.value.copy(
+//                        ex = ex.localizedMessage,
+//                        isSearchStarted = false
+//                    )
+                    _eventFlow.send(NotesEvent.FailureEvent(message = "Failed with ${ex.message}"))
                 }
             }
         }
@@ -141,27 +155,43 @@ class NotesViewModal
                 }
             }catch (ex: CancellationException){
                 if (ex.message?.contains("401") == true){
-                    _state.value = state.value.copy(
-                        hasJwtExpired = true,
-                        isSearchStarted = false
-                    )
+//                    _state.value = state.value.copy(
+//                        hasJwtExpired = true,
+//                        isSearchStarted = false
+//                    )
+                    _eventFlow.send(NotesEvent.TokenExpiredFailure("Session Expired, please login again to continue!"))
+                }else if (ex.message?.contains("Failed to connect") == true){
+//                    _state.value = state.value.copy(
+//                        ex = ex.localizedMessage,
+//                        isSearchStarted = false
+//                    )
+                    _eventFlow.send(NotesEvent.FailureEvent(message = "Looks like the server is down, try again later"))
                 }else{
-                    _state.value = state.value.copy(
-                        ex = ex.localizedMessage,
-                        isSearchStarted = false
-                    )
+//                    _state.value = state.value.copy(
+//                        ex = ex.localizedMessage,
+//                        isSearchStarted = false
+//                    )
+                    _eventFlow.send(NotesEvent.FailureEvent(message = "Failed with ${ex.message}"))
                 }
             }catch (ex: Exception){
                 if (ex.message?.contains("401") == true){
-                    _state.value = state.value.copy(
-                        hasJwtExpired = true,
-                        isSearchStarted = false
-                    )
+//                    _state.value = state.value.copy(
+//                        hasJwtExpired = true,
+//                        isSearchStarted = false
+//                    )
+                    _eventFlow.send(NotesEvent.TokenExpiredFailure("Session Expired, please login again to continue!"))
+                }else if (ex.message?.contains("Failed to connect") == true){
+//                    _state.value = state.value.copy(
+//                        ex = ex.localizedMessage,
+//                        isSearchStarted = false
+//                    )
+                    _eventFlow.send(NotesEvent.FailureEvent(message = "Looks like the server is down, try again later"))
                 }else{
-                    _state.value = state.value.copy(
-                        ex = ex.localizedMessage,
-                        isSearchStarted = false
-                    )
+//                    _state.value = state.value.copy(
+//                        ex = ex.localizedMessage,
+//                        isSearchStarted = false
+//                    )
+                    _eventFlow.send(NotesEvent.FailureEvent(message = "Failed with ${ex.message}"))
                 }
             }
         }

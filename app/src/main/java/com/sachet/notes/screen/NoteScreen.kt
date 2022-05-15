@@ -42,7 +42,7 @@ fun NoteScreen(
     LaunchedEffect(true) {
         viewModal.eventFlow.collectLatest { event ->
             when (event) {
-                is NotesEvent.FetchNotesEventFailure -> {
+                is NotesEvent.FailureEvent -> {
                     println("FAILUREEVENT")
                     scaffoldState.snackbarHostState.showSnackbar(
                         message = event.message,

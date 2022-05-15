@@ -15,10 +15,12 @@ import com.sachet.notes.model.RegisterState
 import com.sachet.notes.model.SignUpState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.onSubscription
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,8 +41,8 @@ class LoginSignUpViewModal
     private var _signUpState = mutableStateOf(SignUpState())
     var signUpState: State<SignUpState> = _signUpState
 
-    private val _eventFlow = MutableSharedFlow<LoginSignUpEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    private val _eventFlow = Channel<LoginSignUpEvent>()
+    val eventFlow = _eventFlow.receiveAsFlow()
 
     val toggleLoginSignupScreen = mutableStateOf(false)
     var passwordVisibility = mutableStateOf(false)
@@ -53,21 +55,15 @@ class LoginSignUpViewModal
                 )
                 userCredRepository.getCred().also {security ->
                     if (security?.authToken.isNullOrEmpty()){
-                        println("RECEIVED NULL TOKEN")
-                        delay(100)
-                        _eventFlow.emit(LoginSignUpEvent.ErrorEvent("Please Login to continue", ""))
+                        _eventFlow.send(LoginSignUpEvent.ErrorEvent("Please Login to continue", ""))
                         _state.value = state.value.copy(
                             isSearchStarted = false
                         )
                     }else{
-                        println("LOGGED IN")
-                        println(security)
                         _state.value = state.value.copy(
                             isSearchStarted = false,
-                            token = security?.authToken
                         )
-                        delay(100)
-                        _eventFlow.emit(LoginSignUpEvent.SuccessEventLogIn("Subscribing"))
+                        _eventFlow.send(LoginSignUpEvent.SuccessEventLogIn("Subscribing"))
                     }
 
                 }
@@ -90,29 +86,27 @@ class LoginSignUpViewModal
                 if (loginResponse.exception == null){
                     userCredRepository.saveToken(loginResponse.token!!)
                     _state.value = state.value.copy(
-                        token = loginResponse.token,
                         isSearchStarted = false
                     )
-//                    delay(100)
-                    _eventFlow.emit(LoginSignUpEvent.SuccessEventLogIn(message = "Logged In"))
+                    _eventFlow.send(LoginSignUpEvent.SuccessEventLogIn(message = "Logged In"))
                 }else{
                     _state.value = state.value.copy(
                         isSearchStarted = false
                     )
-                    _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = loginResponse.exception))
+                    _eventFlow.send(LoginSignUpEvent.ErrorEvent(message = loginResponse.exception))
                 }
             }catch (ex: CancellationException){
                 var message = "There is an error!"
                 if (ex.message?.contains("Failed to connect") == true){
                     message = "Looks Like server is down"
                 }
-                _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = message, actionMessage = "Try Again later!"))
+                _eventFlow.send(LoginSignUpEvent.ErrorEvent(message = message, actionMessage = "Try Again later!"))
             }catch (ex: Exception){
                 var message = "There is an error!"
                 if (ex.message?.contains("Failed to connect") == true){
                     message = "Looks Like server is down"
                 }
-                _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = message, actionMessage = "Try Again later!"))
+                _eventFlow.send(LoginSignUpEvent.ErrorEvent(message = message, actionMessage = "Try Again later!"))
             }
         }
     }
@@ -129,9 +123,9 @@ class LoginSignUpViewModal
                 )
                 val signUpResponse = userRepository.saveUser(user)
                 if (signUpResponse.code != 200){
-                    _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = signUpResponse.message))
+                    _eventFlow.send(LoginSignUpEvent.ErrorEvent(message = signUpResponse.message))
                 }else{
-                    _eventFlow.emit(LoginSignUpEvent.SuccessEventSignUp(message = signUpResponse.message))
+                    _eventFlow.send(LoginSignUpEvent.SuccessEventSignUp(message = signUpResponse.message))
                     _signUpState.value = signUpState.value.copy(
                         firstName = "",
                         lastName = "",
@@ -146,13 +140,13 @@ class LoginSignUpViewModal
                 if (ex.message?.contains("Failed to connect") == true){
                     message = "Looks Like server is down"
                 }
-                _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = message, actionMessage = "Try Again later!"))
+                _eventFlow.send(LoginSignUpEvent.ErrorEvent(message = message, actionMessage = "Try Again later!"))
             }catch (ex: Exception){
                 var message = "There is an error!"
                 if (ex.message?.contains("Failed to connect") == true){
                     message = "Looks Like server is down"
                 }
-                _eventFlow.emit(LoginSignUpEvent.ErrorEvent(message = message, actionMessage = "Try Again later!"))
+                _eventFlow.send(LoginSignUpEvent.ErrorEvent(message = message, actionMessage = "Try Again later!"))
             }
         }
     }

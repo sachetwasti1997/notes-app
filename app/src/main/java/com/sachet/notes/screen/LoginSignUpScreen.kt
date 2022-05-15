@@ -38,13 +38,12 @@ fun LoginSignUpScreen(
     loginSignUpViewModal: LoginSignUpViewModal = hiltViewModel(),
 ) {
 
-    val token = loginSignUpViewModal.state.value.token
     val loginSignUp = loginSignUpViewModal.toggleLoginSignupScreen.value
     val isSearchStarted = loginSignUpViewModal.state.value.isSearchStarted
     val state = rememberScaffoldState()
 
     LaunchedEffect(true) {
-        loginSignUpViewModal.eventFlow.collectLatest { event ->
+        loginSignUpViewModal.eventFlow.collect { event ->
             when (event) {
                 is LoginSignUpEvent.ErrorEvent -> {
                     state.snackbarHostState.showSnackbar(
@@ -69,12 +68,6 @@ fun LoginSignUpScreen(
     Scaffold(
         scaffoldState = state
     ) {
-//        if (token?.isNotEmpty() == true) {
-//            LaunchedEffect(Unit) {
-//                navController.popBackStack()
-//                navController.navigate(NotesScreen.HomeScreen.name + "?noteId=")
-//            }
-//        }
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
