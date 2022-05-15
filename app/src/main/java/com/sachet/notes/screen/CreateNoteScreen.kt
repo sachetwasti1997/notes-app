@@ -66,6 +66,18 @@ fun CreateNoteScreen(
                         navController.navigate(NotesScreen.HomeScreen.name+"?noteId=${event.noteId}")
                     }
                 }
+                is AddEditNoteViewModal.UiEvent.LogUserOut -> {
+                    coroutineScope {
+                        viewModel.logOut()
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            message = event.noteId!!
+                        )
+                        while (!navController.backQueue.isEmpty()){
+                            navController.popBackStack()
+                        }
+                        navController.navigate(NotesScreen.LoginScreen.name)
+                    }
+                }
             }
         }
     }

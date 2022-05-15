@@ -2,6 +2,8 @@ package com.sachet.notes.util
 
 import android.util.Log
 import com.sachet.notes.data.Note
+import com.sachet.notes.model.NotesOrder
+import com.sachet.notes.model.OrderType
 
 fun orderBy(noteList: List<Note>, notesOrder: NotesOrder): List<Note>{
     var modifiedNotes = noteList

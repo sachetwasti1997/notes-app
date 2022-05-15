@@ -27,7 +27,9 @@ import com.sachet.notes.navigation.NotesScreen
 import com.sachet.notes.util.LoginSignUpEvent
 import com.sachet.notes.viewModal.LoginSignUpViewModal
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginSignUpScreen(
@@ -39,6 +41,7 @@ fun LoginSignUpScreen(
     val loginSignUp = loginSignUpViewModal.toggleLoginSignupScreen.value
     val isSearchStarted = loginSignUpViewModal.state.value.isSearchStarted
     val state = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(true) {
         loginSignUpViewModal.eventFlow.collectLatest { event ->

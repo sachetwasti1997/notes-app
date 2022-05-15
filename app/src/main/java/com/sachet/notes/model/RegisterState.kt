@@ -1,4 +1,4 @@
-package com.sachet.notes.util
+package com.sachet.notes.model
 
 import com.sachet.notes.data.Note
 

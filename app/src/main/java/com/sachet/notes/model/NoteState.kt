@@ -1,7 +1,6 @@
-package com.sachet.notes.util
+package com.sachet.notes.model
 
 import com.sachet.notes.data.Note
-import java.lang.Exception
 
 data class NoteState(
     var notes: List<Note> = ArrayList(),
@@ -10,5 +9,6 @@ data class NoteState(
     val ex: String? = null,
     val initialStateSet: Boolean ?= false,
     val credential: String? = "",
-    val isSearchStarted: Boolean = false
+    val isSearchStarted: Boolean = false,
+    val hasJwtExpired: Boolean = false
 )

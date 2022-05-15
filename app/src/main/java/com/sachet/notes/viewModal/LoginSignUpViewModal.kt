@@ -10,9 +10,9 @@ import com.sachet.notes.db.UserCredRepository
 import com.sachet.notes.network.NotesRepository
 import com.sachet.notes.network.UserRepository
 import com.sachet.notes.util.LoginSignUpEvent
-import com.sachet.notes.util.LoginState
-import com.sachet.notes.util.RegisterState
-import com.sachet.notes.util.SignUpState
+import com.sachet.notes.model.LoginState
+import com.sachet.notes.model.RegisterState
+import com.sachet.notes.model.SignUpState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -44,19 +44,33 @@ class LoginSignUpViewModal
     var passwordVisibility = mutableStateOf(false)
 
     init {
-        getUserToken()
-    }
+        try {
+            viewModelScope.launch {
+                _state.value = state.value.copy(
+                    isSearchStarted = true
+                )
+                userCredRepository.getCred().also {security ->
+                    if (security?.authToken.isNullOrEmpty()){
+                        _eventFlow.emit(LoginSignUpEvent.ErrorEvent("Please Login to continue"))
+                        _state.value = state.value.copy(
+                            isSearchStarted = false
+                        )
+                    }else{
+                        println("LOGGED IN")
+                        println(security)
+                        _state.value = state.value.copy(
+                            isSearchStarted = false,
+                            token = security?.authToken
+                        )
+//                        _eventFlow.emit(LoginSignUpEvent.SuccessEventLogIn("Successful Loggin"))
+                    }
 
-    fun getUserToken(){
-        viewModelScope.launch {
-            _state.value = state.value.copy(
-                isSearchStarted = true
-            )
-            val security = userCredRepository.getCred()
-            _state.value = state.value.copy(
-                token = security?.authToken,
-                isSearchStarted = false
-            )
+                }
+            }
+        }catch (ex: CancellationException){
+            println(ex.message)
+        }catch (ex: Exception){
+           println(ex.message)
         }
     }
 
@@ -74,7 +88,7 @@ class LoginSignUpViewModal
                         token = loginResponse.token,
                         isSearchStarted = false
                     )
-                    _eventFlow.emit(LoginSignUpEvent.SuccessEventLogIn(message = "Logged In"))
+//                    _eventFlow.emit(LoginSignUpEvent.SuccessEventLogIn(message = "Logged In"))
                 }else{
                     _state.value = state.value.copy(
                         isSearchStarted = false
@@ -137,12 +151,6 @@ class LoginSignUpViewModal
         }
     }
 
-    fun navigateToHome(){
-        viewModelScope.launch {
-            _eventFlow.emit(LoginSignUpEvent.SuccessEventLogIn(message = "Successfully Logged in"))
-        }
-    }
-
     fun changeUserName(userName: String){
         _loginState.value = loginState.value.copy(
             userName = userName
@@ -193,16 +201,6 @@ class LoginSignUpViewModal
         _signUpState.value = signUpState.value.copy(
             password = password
         )
-    }
-
-    fun logOut(){
-        viewModelScope.launch {
-            userCredRepository.deleteToken()
-            _state.value = state.value.copy(
-                token = null,
-            )
-            toggleLoginSignupScreen.value = false
-        }
     }
 
 }

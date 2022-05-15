@@ -1,4 +1,4 @@
-package com.sachet.notes.util
+package com.sachet.notes.model
 
 data class NotesTextFieldState(
     val text: String = "",

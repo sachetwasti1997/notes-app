@@ -3,17 +3,21 @@ package com.sachet.notes.viewModal
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sachet.notes.data.Note
 import com.sachet.notes.db.UserCredRepository
+import com.sachet.notes.model.NoteState
+import com.sachet.notes.util.NotesEvent
+import com.sachet.notes.model.NotesOrder
+import com.sachet.notes.model.OrderType
 import com.sachet.notes.network.NotesRepository
 import com.sachet.notes.util.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,6 +31,8 @@ class NotesViewModal
 
     private val _state = mutableStateOf(NoteState())
     val state: State<NoteState> = _state
+    private val _eventFlow = MutableSharedFlow<NotesEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
 
     var logOut = mutableStateOf(false)
 
@@ -38,23 +44,47 @@ class NotesViewModal
                 )
                 val token = userCredRepository.getCred()
                 val allNotes = notesRepository.getAllNotes("Bearer ${token?.authToken}")
-                _state.value = state.value.copy(
-                    notes = orderBy(allNotes, NotesOrder.Date(OrderType.Ascending)),
-                    notesOrder = NotesOrder.Date(orderType = OrderType.Ascending),
-                    ex = null,
-                    credential = "Bearer ${token?.authToken}",
-                    isSearchStarted = false
-                )
+                if (allNotes.code == 200){
+                    _state.value = state.value.copy(
+                        notes = orderBy(allNotes.notes, NotesOrder.Date(OrderType.Ascending)),
+                        notesOrder = NotesOrder.Date(orderType = OrderType.Ascending),
+                        ex = null,
+                        credential = "Bearer ${token?.authToken}",
+                        isSearchStarted = false
+                    )
+                }else{
+                    println("FAILURE EVENT $allNotes")
+                    _eventFlow.emit(NotesEvent.FetchNotesEventFailure(allNotes.message))
+                    _state.value = state.value.copy(
+                        isSearchStarted = false
+                    )
+                }
             }catch (ex: CancellationException){
-                _state.value = state.value.copy(
-                    ex = ex.localizedMessage,
-                    isSearchStarted = false
-                )
+                if (ex.message?.contains("401") == true){
+//                    _state.value = state.value.copy(
+//                        hasJwtExpired = true,
+//                        isSearchStarted = false
+//                    )
+                    _eventFlow.emit(NotesEvent.TokenExpiredFailure())
+                }else{
+                    _state.value = state.value.copy(
+                        ex = ex.localizedMessage,
+                        isSearchStarted = false
+                    )
+                }
             }catch (ex: Exception){
-                _state.value = state.value.copy(
-                    ex = ex.localizedMessage,
-                    isSearchStarted = false
-                )
+                if (ex.message?.contains("401") == true){
+//                    _state.value = state.value.copy(
+//                        hasJwtExpired = true,
+//                        isSearchStarted = false
+//                    )
+                    _eventFlow.emit(NotesEvent.TokenExpiredFailure())
+                }else{
+                    _state.value = state.value.copy(
+                        ex = ex.localizedMessage,
+                        isSearchStarted = false
+                    )
+                }
             }
         }
     }
@@ -97,14 +127,42 @@ class NotesViewModal
 
     fun deleteNote(credential: String,note: Note){
         viewModelScope.launch {
-            val result = notesRepository.deleteNote(state.value.credential, note.noteId)
-            if (result.data != null){
-                val newNote = _state.value.notes.filter {
-                    it.noteId != result.data
+            try {
+                val result = notesRepository.deleteNote(state.value.credential, note.noteId)
+                if (result.code == 200){
+                    val newNote = _state.value.notes.filter {
+                        it.noteId != result.message
+                    }
+                    _state.value = state.value.copy(
+                        notes = newNote
+                    )
+                }else{
+
                 }
-                _state.value = state.value.copy(
-                    notes = newNote
-                )
+            }catch (ex: CancellationException){
+                if (ex.message?.contains("401") == true){
+                    _state.value = state.value.copy(
+                        hasJwtExpired = true,
+                        isSearchStarted = false
+                    )
+                }else{
+                    _state.value = state.value.copy(
+                        ex = ex.localizedMessage,
+                        isSearchStarted = false
+                    )
+                }
+            }catch (ex: Exception){
+                if (ex.message?.contains("401") == true){
+                    _state.value = state.value.copy(
+                        hasJwtExpired = true,
+                        isSearchStarted = false
+                    )
+                }else{
+                    _state.value = state.value.copy(
+                        ex = ex.localizedMessage,
+                        isSearchStarted = false
+                    )
+                }
             }
         }
     }

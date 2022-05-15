@@ -1,4 +1,4 @@
-package com.sachet.notes.util
+package com.sachet.notes.model
 
 sealed class OrderType{
     object Ascending : OrderType()

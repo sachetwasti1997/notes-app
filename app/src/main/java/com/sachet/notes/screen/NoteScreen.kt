@@ -8,13 +8,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -23,10 +21,9 @@ import androidx.navigation.NavController
 import com.sachet.notes.components.NoteItem
 import com.sachet.notes.components.OrderSection
 import com.sachet.notes.navigation.NotesScreen
-import com.sachet.notes.util.NoteState
 import com.sachet.notes.util.NotesEvent
-import com.sachet.notes.viewModal.LoginSignUpViewModal
 import com.sachet.notes.viewModal.NotesViewModal
+import kotlinx.coroutines.flow.collectLatest
 
 
 @Composable
@@ -35,27 +32,53 @@ fun NoteScreen(
     noteId: String?,
     token: String,
     viewModal: NotesViewModal = hiltViewModel()
-){
+) {
 
     val state = viewModal.state.value
     val scaffoldState = rememberScaffoldState()
     val logOut = viewModal.logOut.value
 
-    if (state.ex != null){
-        LaunchedEffect(scaffoldState.snackbarHostState){
-            scaffoldState.snackbarHostState.showSnackbar(
-                message = state.ex,
-                actionLabel = "Please Retry Again"
-            )
+//    if (state.ex != null){
+    LaunchedEffect(true) {
+        viewModal.eventFlow.collectLatest { event ->
+            when (event) {
+                is NotesEvent.FetchNotesEventFailure -> {
+                    println("FAILUREEVENT")
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = event.message,
+                    )
+                }
+                is NotesEvent.TokenExpiredFailure -> {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = "Session has expired please login again to continue",
+                    )
+                    viewModal.logOut()
+                    navController.popBackStack()
+                    navController.navigate(NotesScreen.LoginScreen.name)
+                }
+            }
         }
     }
+//    }
+
+//    if (viewModal.state.value.hasJwtExpired) {
+//        LaunchedEffect(Unit) {
+//            scaffoldState.snackbarHostState.showSnackbar(
+//                message = "Token Expired, please log in again"
+//            )
+//            viewModal.logOut()
+//            navController.popBackStack()
+//            navController.navigate(NotesScreen.LoginScreen.name)
+//        }
+//    }
 
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navController.navigate(NotesScreen.CreateNotesScreen.name
-                        +"?noteId=&noteColor=-1"
+                    navController.navigate(
+                        NotesScreen.CreateNotesScreen.name
+                                + "?noteId=&noteColor=-1"
                     )
                 },
                 backgroundColor = MaterialTheme.colors.primary,
@@ -66,6 +89,7 @@ fun NoteScreen(
         floatingActionButtonPosition = FabPosition.Center,
         scaffoldState = scaffoldState
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -93,7 +117,10 @@ fun NoteScreen(
                         navController.popBackStack()
                         navController.navigate(NotesScreen.LoginScreen.name)
                     }) {
-                        Icon(imageVector = Icons.Default.Logout, contentDescription = "Account Actions")
+                        Icon(
+                            imageVector = Icons.Default.Logout,
+                            contentDescription = "Account Actions"
+                        )
                     }
                 }
             }
@@ -113,12 +140,12 @@ fun NoteScreen(
                         .padding(16.dp)
                 )
             }
-            if (state.isSearchStarted){
+            if (state.isSearchStarted) {
                 CircularProgressIndicator()
             }
             Spacer(modifier = Modifier.height(16.dp))
-            LazyColumn(modifier = Modifier.fillMaxSize()){
-                items(state.notes){ note ->
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                items(state.notes) { note ->
                     NoteItem(
                         note = note,
                         modifier = Modifier
@@ -131,7 +158,7 @@ fun NoteScreen(
                                 )
                             },
                         onDeleteClick = {
-                            viewModal.deleteNote(credential = "Bearer $token",note)
+                            viewModal.deleteNote(credential = "Bearer $token", note)
                         }
                     )
                 }
