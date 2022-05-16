@@ -29,16 +29,13 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun NoteScreen(
     navController: NavController,
-    noteId: String?,
     token: String,
     viewModal: NotesViewModal = hiltViewModel()
 ) {
 
     val state = viewModal.state.value
     val scaffoldState = rememberScaffoldState()
-    val logOut = viewModal.logOut.value
 
-//    if (state.ex != null){
     LaunchedEffect(true) {
         viewModal.eventFlow.collectLatest { event ->
             when (event) {
@@ -59,18 +56,6 @@ fun NoteScreen(
             }
         }
     }
-//    }
-
-//    if (viewModal.state.value.hasJwtExpired) {
-//        LaunchedEffect(Unit) {
-//            scaffoldState.snackbarHostState.showSnackbar(
-//                message = "Token Expired, please log in again"
-//            )
-//            viewModal.logOut()
-//            navController.popBackStack()
-//            navController.navigate(NotesScreen.LoginScreen.name)
-//        }
-//    }
 
     Scaffold(
         floatingActionButton = {

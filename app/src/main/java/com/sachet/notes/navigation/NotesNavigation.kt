@@ -34,8 +34,7 @@ fun NotesNavigation(token: String){
                 },
             )
         ){
-            val noteId = it.arguments?.getString("noteId")
-            NoteScreen(navController = navController, noteId = noteId, token = token)
+            NoteScreen(navController = navController, token = token)
         }
         composable(
             route = NotesScreen.CreateNotesScreen.name

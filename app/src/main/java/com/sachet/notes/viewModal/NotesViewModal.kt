@@ -26,15 +26,12 @@ class NotesViewModal
 @Inject constructor(
     var notesRepository: NotesRepository,
     var userCredRepository: UserCredRepository,
-    savedStateHandle: SavedStateHandle
 ) : ViewModel(){
 
     private val _state = mutableStateOf(NoteState())
     val state: State<NoteState> = _state
     private val _eventFlow = Channel<NotesEvent>()
     val eventFlow = _eventFlow.receiveAsFlow()
-
-    var logOut = mutableStateOf(false)
 
     init {
         viewModelScope.launch {
@@ -48,12 +45,10 @@ class NotesViewModal
                     _state.value = state.value.copy(
                         notes = orderBy(allNotes.notes, NotesOrder.Date(OrderType.Ascending)),
                         notesOrder = NotesOrder.Date(orderType = OrderType.Ascending),
-                        ex = null,
                         credential = "Bearer ${token?.authToken}",
                         isSearchStarted = false
                     )
                 }else{
-//                    println("FAILURE EVENT $allNotes")
                     _eventFlow.send(NotesEvent.FailureEvent(allNotes.message))
                     _state.value = state.value.copy(
                         isSearchStarted = false
@@ -61,42 +56,18 @@ class NotesViewModal
                 }
             }catch (ex: CancellationException){
                 if (ex.message?.contains("401") == true){
-//                    _state.value = state.value.copy(
-//                        hasJwtExpired = true,
-//                        isSearchStarted = false
-//                    )
                     _eventFlow.send(NotesEvent.TokenExpiredFailure("Session Expired, please login again to continue!"))
                 }else if (ex.message?.contains("Failed to connect") == true){
-//                    _state.value = state.value.copy(
-//                        ex = ex.localizedMessage,
-//                        isSearchStarted = false
-//                    )
                     _eventFlow.send(NotesEvent.FailureEvent(message = "Looks like the server is down, try again later"))
                 }else{
-//                    _state.value = state.value.copy(
-//                        ex = ex.localizedMessage,
-//                        isSearchStarted = false
-//                    )
                     _eventFlow.send(NotesEvent.FailureEvent(message = "Failed with ${ex.message}"))
                 }
             }catch (ex: Exception){
                 if (ex.message?.contains("401") == true){
-//                    _state.value = state.value.copy(
-//                        hasJwtExpired = true,
-//                        isSearchStarted = false
-//                    )
                     _eventFlow.send(NotesEvent.TokenExpiredFailure("Session Expired, please login again to continue!"))
                 }else if (ex.message?.contains("Failed to connect") == true){
-//                    _state.value = state.value.copy(
-//                        ex = ex.localizedMessage,
-//                        isSearchStarted = false
-//                    )
                     _eventFlow.send(NotesEvent.FailureEvent(message = "Looks like the server is down, try again later"))
                 }else{
-//                    _state.value = state.value.copy(
-//                        ex = ex.localizedMessage,
-//                        isSearchStarted = false
-//                    )
                     _eventFlow.send(NotesEvent.FailureEvent(message = "Failed with ${ex.message}"))
                 }
             }
@@ -155,42 +126,18 @@ class NotesViewModal
                 }
             }catch (ex: CancellationException){
                 if (ex.message?.contains("401") == true){
-//                    _state.value = state.value.copy(
-//                        hasJwtExpired = true,
-//                        isSearchStarted = false
-//                    )
                     _eventFlow.send(NotesEvent.TokenExpiredFailure("Session Expired, please login again to continue!"))
                 }else if (ex.message?.contains("Failed to connect") == true){
-//                    _state.value = state.value.copy(
-//                        ex = ex.localizedMessage,
-//                        isSearchStarted = false
-//                    )
                     _eventFlow.send(NotesEvent.FailureEvent(message = "Looks like the server is down, try again later"))
                 }else{
-//                    _state.value = state.value.copy(
-//                        ex = ex.localizedMessage,
-//                        isSearchStarted = false
-//                    )
                     _eventFlow.send(NotesEvent.FailureEvent(message = "Failed with ${ex.message}"))
                 }
             }catch (ex: Exception){
                 if (ex.message?.contains("401") == true){
-//                    _state.value = state.value.copy(
-//                        hasJwtExpired = true,
-//                        isSearchStarted = false
-//                    )
                     _eventFlow.send(NotesEvent.TokenExpiredFailure("Session Expired, please login again to continue!"))
                 }else if (ex.message?.contains("Failed to connect") == true){
-//                    _state.value = state.value.copy(
-//                        ex = ex.localizedMessage,
-//                        isSearchStarted = false
-//                    )
                     _eventFlow.send(NotesEvent.FailureEvent(message = "Looks like the server is down, try again later"))
                 }else{
-//                    _state.value = state.value.copy(
-//                        ex = ex.localizedMessage,
-//                        isSearchStarted = false
-//                    )
                     _eventFlow.send(NotesEvent.FailureEvent(message = "Failed with ${ex.message}"))
                 }
             }
@@ -200,7 +147,6 @@ class NotesViewModal
     fun logOut(){
         viewModelScope.launch {
             userCredRepository.deleteToken()
-            logOut.value = true
         }
     }
 
