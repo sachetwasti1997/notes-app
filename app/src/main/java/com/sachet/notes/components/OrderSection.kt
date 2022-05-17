@@ -7,8 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sachet.notes.viewModal.NotesViewModal
-import com.sachet.notes.model.NotesOrder
-import com.sachet.notes.model.OrderType
+import com.sachet.notes.data.NotesOrder
+import com.sachet.notes.data.OrderType
 
 @Composable
 fun OrderSection(

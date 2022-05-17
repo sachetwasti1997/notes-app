@@ -1,12 +1,10 @@
 package com.sachet.notes.network
 
 import com.sachet.notes.data.Note
-import com.sachet.notes.model.DeleteNoteResponse
-import com.sachet.notes.model.GetNoteResponse
+import com.sachet.notes.data.DeleteNoteResponse
+import com.sachet.notes.data.GetNoteResponse
 import retrofit2.http.*
-import java.util.*
 import javax.inject.Singleton
-import kotlin.collections.ArrayList
 
 @Singleton
 interface NotesApi {

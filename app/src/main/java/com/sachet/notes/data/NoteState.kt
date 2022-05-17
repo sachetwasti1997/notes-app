@@ -1,6 +1,4 @@
-package com.sachet.notes.model
-
-import com.sachet.notes.data.Note
+package com.sachet.notes.data
 
 data class NoteState(
     var notes: List<Note> = ArrayList(),

@@ -1,7 +1,7 @@
 package com.sachet.notes.util
 
 import com.sachet.notes.data.Note
-import com.sachet.notes.model.NotesOrder
+import com.sachet.notes.data.NotesOrder
 
 sealed class NotesEvent{
     data class Order(val newNotesOrder: NotesOrder): NotesEvent()

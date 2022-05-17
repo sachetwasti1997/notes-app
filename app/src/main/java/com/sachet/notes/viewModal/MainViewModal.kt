@@ -4,7 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.sachet.notes.network.NotesRepository
-import com.sachet.notes.model.NoteState
+import com.sachet.notes.data.NoteState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

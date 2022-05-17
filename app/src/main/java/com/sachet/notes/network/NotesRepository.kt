@@ -1,13 +1,10 @@
 package com.sachet.notes.network
 
-import android.util.JsonToken
-import android.util.Log
 import com.sachet.notes.data.Note
 import com.sachet.notes.data.Response
-import com.sachet.notes.model.DeleteNoteResponse
-import com.sachet.notes.model.GetNoteResponse
+import com.sachet.notes.data.DeleteNoteResponse
+import com.sachet.notes.data.GetNoteResponse
 import java.lang.Exception
-import java.util.concurrent.CancellationException
 import javax.inject.Inject
 
 class NotesRepository
@@ -22,7 +19,7 @@ class NotesRepository
 
     suspend fun getAllNotes(
         token: String?,
-    ): GetNoteResponse{
+    ): GetNoteResponse {
 //        var noteList = ArrayList<Note>()
 //        try {
             return notesApi.getNotesOfUser(token)
@@ -43,7 +40,7 @@ class NotesRepository
         return note
     }
 
-    suspend fun deleteNote(token: String?, noteId: String?):DeleteNoteResponse{
+    suspend fun deleteNote(token: String?, noteId: String?): DeleteNoteResponse {
         return notesApi.deleteNoteById(token, noteId)
     }
 

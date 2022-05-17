@@ -1,4 +1,4 @@
-package com.sachet.notes.util
+package com.sachet.notes.data
 
 data class LoginResponse(
     val token: String ?= null,

@@ -10,7 +10,7 @@ import com.sachet.notes.data.Note
 import com.sachet.notes.db.UserCredRepository
 import com.sachet.notes.network.NotesRepository
 import com.sachet.notes.util.AddEditNoteEvent
-import com.sachet.notes.model.NotesTextFieldState
+import com.sachet.notes.data.NotesTextFieldState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableSharedFlow
